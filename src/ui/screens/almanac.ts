@@ -100,7 +100,7 @@ function traitsTab(ctx: Ctx): HTMLElement {
         { class: 'chips' },
         list.map((t) => {
           if (s.discoveredTraits[t.id]) return traitChip(t.id, { onClick: () => showTraitInfo(t.id) });
-          return h('button', { class: 'chip locked btn-chip', type: 'button', onclick: () => showLocked(t.id, notes) }, h('span', { class: 'e' }, '?'), notes ? t.name : `${RARITY_LABEL[t.rarity]} ${t.category === 'combo' ? 'combination' : 'trait'}`);
+          return h('button', { class: `chip locked btn-chip ${t.rarity !== 'common' ? t.rarity : ''}`, type: 'button', 'aria-label': `Undiscovered ${RARITY_LABEL[t.rarity]} trait`, onclick: () => showLocked(t.id, notes) }, h('span', { class: 'e' }, '?'), notes ? t.name : t.rarity === 'common' ? '· · ·' : RARITY_LABEL[t.rarity]);
         }),
       ),
     );

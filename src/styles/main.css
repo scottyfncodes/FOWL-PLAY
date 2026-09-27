@@ -357,7 +357,7 @@ main.screen {
 .plate-no { font-family: var(--font-display); font-style: italic; color: var(--ink-3); font-size: 12px; }
 .trait-cat { margin-bottom: 14px; }
 .trait-btn { border: 0; padding: 0; background: none; }
-.chip.locked { background: var(--paper-2); color: var(--ink-3); border-style: dashed; }
+.chip.locked { background: var(--paper-2); color: var(--ink-3); border-style: dashed; opacity: 0.85; }
 .milestone { display: flex; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); margin-bottom: 8px; }
 .milestone.done { border-color: color-mix(in srgb, var(--mustard) 70%, transparent); background: color-mix(in srgb, var(--mustard) 10%, var(--card)); }
 .milestone .e { font-size: 26px; width: 36px; text-align: center; }

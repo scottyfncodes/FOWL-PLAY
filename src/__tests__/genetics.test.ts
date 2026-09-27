@@ -196,7 +196,7 @@ describe('breeding', () => {
       }
     }
     expect(total).toBeGreaterThan(5);
-    expect(total / 300).toBeLessThan(1.5);
+    expect(total / 300).toBeLessThan(0.5);
   });
   it('preview reports certain crest for Polish × Orpington', () => {
     const preview = previewPairing(make('polish'), make('orpington', 2), new Set());
