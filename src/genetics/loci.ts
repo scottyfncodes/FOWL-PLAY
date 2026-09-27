@@ -164,9 +164,9 @@ export const LOCI: LocusDef[] = [
   L('eggSize', 'Egg size', 'egg', [['EL', 'Large eggs'], ['es', 'Small eggs']], 'es', [['EL', 1]]),
   L('laying', 'Laying', 'egg', [['hi', 'Prolific'], ['mid', 'Steady'], ['lo', 'Occasional']], 'mid', [['hi', 1], ['lo', 1]]),
   // ---- Personality ------------------------------------------------------
-  L('temper', 'Temperament', 'personality', [['energetic', 'Energetic'], ['curious', 'Curious'], ['calm', 'Calm']], 'curious', [['energetic', 1], ['calm', 1], ['curious', 1]], 1.5),
-  L('social', 'Sociability', 'personality', [['friendly', 'Friendly'], ['social', 'Social'], ['aloof', 'Aloof'], ['stubborn', 'Stubborn']], 'social', [['friendly', 1], ['aloof', 1], ['stubborn', 1]], 1.5),
-  L('flair', 'Flair', 'personality', [['dramatic', 'Dramatic'], ['judgmental', 'Judgmental'], ['dignified', 'Dignified'], ['none', 'Unremarkable']], 'none', [['dramatic', 2], ['judgmental', 2], ['dignified', 1]], 2),
+  L('temper', 'Temperament', 'personality', [['energetic', 'Energetic'], ['curious', 'Curious'], ['calm', 'Calm']], 'curious', [['energetic', 1], ['calm', 1], ['curious', 1]], 0.6),
+  L('social', 'Sociability', 'personality', [['friendly', 'Friendly'], ['social', 'Social'], ['aloof', 'Aloof'], ['stubborn', 'Stubborn']], 'social', [['friendly', 1], ['aloof', 1], ['stubborn', 1]], 0.6),
+  L('flair', 'Flair', 'personality', [['dramatic', 'Dramatic'], ['judgmental', 'Judgmental'], ['dignified', 'Dignified'], ['none', 'Unremarkable']], 'none', [['dramatic', 2], ['judgmental', 2], ['dignified', 1]], 0.8),
   // ---- Utility ----------------------------------------------------------
   L('growth', 'Growth', 'utility', [['fast', 'Fast grower'], ['slow', 'Slow grower']], 'fast', [['slow', 1], ['fast', 1]]),
 ];

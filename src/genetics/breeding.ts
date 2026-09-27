@@ -26,7 +26,7 @@ function ancestryDiversity(a: Chicken, b: Chicken): number {
 export function mutationRate(a: Chicken, b: Chicken): number {
   const diversity = Math.min(5, ancestryDiversity(a, b));
   const gen = Math.min(5, Math.max(a.generation, b.generation));
-  return 0.004 + 0.002 * diversity + 0.001 * gen;
+  return 0.0015 + 0.0008 * diversity + 0.0004 * gen;
 }
 
 /** Mendelian inheritance: one random allele from each parent per locus, with a small mutation chance. */

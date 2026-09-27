@@ -136,9 +136,9 @@ export function rarityOf(traits: string[]): RarityInfo {
     if (RARITY_WEIGHT[t.rarity] > RARITY_WEIGHT[top]) top = t.rarity;
   }
   let tier: RarityTier;
-  if (top === 'legendary' || score >= 26) tier = 'legendary';
-  else if (top === 'exotic' || score >= 16) tier = 'exotic';
-  else if (score >= 9) tier = 'rare';
+  if (top === 'legendary' || score >= 40) tier = 'legendary';
+  else if (top === 'exotic' || score >= 26) tier = 'exotic';
+  else if (top === 'rare' || score >= 10) tier = 'rare';
   else if (score >= 4) tier = 'uncommon';
   else tier = 'common';
   return { tier, score };
