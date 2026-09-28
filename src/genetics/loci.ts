@@ -25,7 +25,7 @@ export interface MutationDef {
 export interface LocusDef {
   id: LocusId;
   name: string;
-  category: 'color' | 'pattern' | 'feather' | 'head' | 'body' | 'legs' | 'egg' | 'personality' | 'utility';
+  category: 'color' | 'pattern' | 'feather' | 'head' | 'body' | 'legs' | 'egg' | 'personality' | 'utility' | 'ability';
   alleles: AlleleDef[];
   /** Wild-type allele used when a breed doesn't specify this locus. */
   wild: string;
@@ -87,7 +87,19 @@ export type LocusId =
   | 'temper'
   | 'social'
   | 'flair'
-  | 'growth';
+  | 'growth'
+  | 'legLen'
+  | 'speed'
+  | 'wing'
+  | 'web'
+  | 'beak'
+  | 'grip'
+  | 'dig'
+  | 'crow'
+  | 'brawn'
+  | 'spring'
+  | 'nerve'
+  | 'habit';
 
 const L = (
   id: LocusId,
@@ -169,6 +181,19 @@ export const LOCI: LocusDef[] = [
   L('flair', 'Flair', 'personality', [['dramatic', 'Dramatic'], ['judgmental', 'Judgmental'], ['dignified', 'Dignified'], ['none', 'Unremarkable']], 'none', [['dramatic', 2], ['judgmental', 2], ['dignified', 1]], 0.8),
   // ---- Utility ----------------------------------------------------------
   L('growth', 'Growth', 'utility', [['fast', 'Fast grower'], ['slow', 'Slow grower']], 'fast', [['slow', 1], ['fast', 1]]),
+  // ---- Ability genes (these decide what a chicken can physically do out on the farm) ----
+  L('legLen', 'Leg length', 'ability', [['L+', 'Normal legs'], ['lg', 'Long legs']], 'L+', [['lg', 1]]),
+  L('speed', 'Pace', 'ability', [['qk', 'Quick'], ['av', 'Average'], ['sl', 'Slow']], 'av', [['qk', 1], ['sl', 1]]),
+  L('wing', 'Wing size', 'ability', [['Wg', 'Big wings'], ['wg+', 'Normal wings']], 'wg+', [['Wg', 1]]),
+  L('web', 'Webbed feet', 'ability', [['wb+', 'Normal feet'], ['wb', 'Webbed feet']], 'wb+', [['wb', 1]], 0.7),
+  L('beak', 'Beak strength', 'ability', [['Bk', 'Strong beak'], ['bk+', 'Normal beak']], 'bk+', [['Bk', 1]]),
+  L('grip', 'Grip', 'ability', [['gr+', 'Normal grip'], ['gr', 'Climbing grip']], 'gr+', [['gr', 1]]),
+  L('dig', 'Digging', 'ability', [['dg+', 'Normal scratcher'], ['dg', 'Digger']], 'dg+', [['dg', 1]]),
+  L('crow', 'Voice', 'ability', [['Cw', 'Loud crow'], ['cw+', 'Ordinary voice']], 'cw+', [['Cw', 1]]),
+  L('brawn', 'Brawn', 'ability', [['Bw', 'Brawny'], ['bw+', 'Ordinary build']], 'bw+', [['Bw', 1]]),
+  L('spring', 'Spring', 'ability', [['jp+', 'Ordinary legs'], ['Jp', 'Springy']], 'jp+', [['Jp', 1]]),
+  L('nerve', 'Nerve', 'personality', [['aggressive', 'Aggressive'], ['brave', 'Brave'], ['steady', 'Steady'], ['skittish', 'Skittish']], 'steady', [['brave', 2], ['skittish', 2], ['aggressive', 1]], 0.6),
+  L('habit', 'Habit', 'personality', [['noisy', 'Noisy'], ['greedy', 'Greedy'], ['plain', 'Plain'], ['sneaky', 'Sneaky']], 'plain', [['sneaky', 2], ['greedy', 1], ['noisy', 1]], 0.6),
 ];
 
 export const LOCUS_BY_ID: Record<LocusId, LocusDef> = Object.fromEntries(LOCI.map((l) => [l.id, l])) as Record<LocusId, LocusDef>;

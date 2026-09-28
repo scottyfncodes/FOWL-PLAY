@@ -84,6 +84,8 @@ export function breedChickens(a: Chicken, b: Chicken, seed: number, name: string
     status: 'coop',
     favorite: false,
     mutations,
+    no: 0,
+    knownGenes: [],
   };
   return { child, seed, mutations };
 }

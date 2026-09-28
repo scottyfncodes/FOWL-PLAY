@@ -91,6 +91,17 @@ export function traitsOf(p: Phenotype): string[] {
   if (p.tail === 'cushion') add('body.cushion');
   if (p.tail === 'rumpless') add('body.rumpless');
 
+  // --- ability-facing body traits ---
+  if (p.longLegs) add('body.longLegs');
+  if (p.bigWings) add('body.bigWings');
+  if (p.brawn > 0) add('body.brawny');
+  if (p.spring === 2) add('body.springy');
+  if (p.beakStrength > 0) add('head.strongBeak');
+  if (p.crowGene > 0) add('head.loudCrow');
+  if (p.webbed) add('leg.webbed');
+  if (p.gripGene + (p.toes === 5 ? 1 : 0) >= 2) add('leg.climber');
+  if (p.digger) add('leg.digger');
+
   // --- legs ---
   if (p.legFeathering === 'heavy') add('leg.boots');
   else if (p.legFeathering === 'light') add('leg.feathered');

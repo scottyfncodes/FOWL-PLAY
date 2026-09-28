@@ -26,6 +26,13 @@ export interface Chicken {
   favorite: boolean;
   /** Loci that mutated at conception. */
   mutations: LocusId[];
+  /** Fowldex entry number, assigned when the chicken joins the flock. */
+  no: number;
+  /**
+   * Hidden genes proven by breeding: ability ids (see genetics/abilities) this
+   * chicken is known to carry because a chick expressed them.
+   */
+  knownGenes: string[];
 }
 
 export interface ChickenView {
@@ -66,6 +73,8 @@ export function createChickenFromBreed(breed: BreedDef, rng: Rng, name: string, 
     status: 'coop',
     favorite: false,
     mutations: [],
+    no: 0,
+    knownGenes: [],
   };
 }
 
@@ -123,5 +132,7 @@ export function sanitizeChicken(input: unknown): Chicken | null {
     status: o.status === 'meadow' ? 'meadow' : 'coop',
     favorite: o.favorite === true,
     mutations: Array.isArray(o.mutations) ? (o.mutations.filter((m) => typeof m === 'string') as LocusId[]) : [],
+    no: Math.max(0, Math.floor(num(o.no, 0))),
+    knownGenes: Array.isArray(o.knownGenes) ? (o.knownGenes.filter((g) => typeof g === 'string') as string[]).slice(0, 20) : [],
   };
 }

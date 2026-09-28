@@ -47,7 +47,7 @@ export interface BreedingRecord {
   seed: number;
 }
 
-export type DiscoveryEventKind = 'trait' | 'breed' | 'resemblance' | 'milestone' | 'ribbon' | 'mutation';
+export type DiscoveryEventKind = 'trait' | 'breed' | 'resemblance' | 'milestone' | 'ribbon' | 'mutation' | 'mission' | 'ability' | 'carrier';
 
 export interface DiscoveryEvent {
   kind: DiscoveryEventKind;
@@ -58,6 +58,40 @@ export interface DiscoveryEvent {
 }
 
 export type OnboardingStep = 'welcome' | 'pickSecond' | 'firstBreed' | 'done';
+
+export interface MissionProgress {
+  discoveredAt: number;
+  solvedAt: number | null;
+  /** Chicken that solved it (kept even if that chicken later retires). */
+  chickenId: string | null;
+  chickenName: string | null;
+  /** Solution method id, e.g. 'gap' or 'glide'. */
+  method: string | null;
+  attempts: number;
+}
+
+export interface AbilityDiscovery {
+  at: number;
+  chickenId: string;
+}
+
+export interface FarmState {
+  missions: Record<string, MissionProgress>;
+  /** Clue ids discovered per mission, in the order they were found. */
+  clues: Record<string, string[]>;
+  /** Abilities seen on a chicken in the flock, by ability id. */
+  discoveredAbilities: Record<string, AbilityDiscovery>;
+  /** Field notes learned the hard way (e.g. "fluffy chickens sink"). */
+  lore: Record<string, number>;
+  /** Corn kernels already collected, by id, so the farm is not a corn farm. */
+  cornTaken: string[];
+  /** Mystery eggs already found. */
+  eggsTaken: string[];
+  lastChickenId: string | null;
+  outings: number;
+  /** Next Fowldex number to hand out. */
+  nextNo: number;
+}
 
 export interface GameState {
   version: number;
@@ -79,6 +113,11 @@ export interface GameState {
   settings: { sound: boolean };
   /** First chicken the player met; used for the welcome flow. */
   starterId: string | null;
+  farm: FarmState;
 }
 
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
+
+export function freshFarm(): FarmState {
+  return { missions: {}, clues: {}, discoveredAbilities: {}, lore: {}, cornTaken: [], eggsTaken: [], lastChickenId: null, outings: 0, nextNo: 1 };
+}
