@@ -7,8 +7,19 @@ import { buyOffer, buyUpgrade, ownsTheme, refreshHatchery, selectTheme, upgradeC
 import type { Ctx } from '../ctx';
 import { sfx } from '../../audio/sfx';
 import { applyTheme } from '../theme';
+import { renderShow } from './show';
 
 export function renderHatchery(ctx: Ctx): HTMLElement {
+  const tabs = h(
+    'div',
+    { class: 'subtabs', role: 'tablist' },
+    ...(['hatchery', 'show'] as const).map((t) => h('button', { class: ctx.ui.hatcheryTab === t ? 'active' : '', role: 'tab', onclick: () => { sfx.tap(); ctx.ui.hatcheryTab = t; ctx.rerender(); } }, { hatchery: '🏡 Hatchery', show: '🎀 Chicken Show' }[t])),
+  );
+  if (ctx.ui.hatcheryTab === 'show') return h('div', null, tabs, renderShow(ctx));
+  return h('div', null, tabs, renderHatcheryBody(ctx));
+}
+
+function renderHatcheryBody(ctx: Ctx): HTMLElement {
   const s = ctx.state;
   const discovered = new Set(Object.keys(s.discoveredBreeds));
   const untilFree = HATCHERY_FREE_REFRESH_EVERY - s.hatchery.hatchesSinceRefresh;
@@ -71,7 +82,7 @@ export function renderHatchery(ctx: Ctx): HTMLElement {
     'div',
     null,
     h('div', { class: 'screen-title' }, h('h2', null, 'The Hatchery'), h('span', { class: 'meta' }, `${s.corn} ${CURRENCY_ICON}`)),
-    h('p', { class: 'lede' }, 'New breeds arrive here. Every adoption is a fresh set of genes to experiment with, and a new page in the Almanac.'),
+    h('p', { class: 'lede' }, 'New breeds arrive here. Every adoption is a fresh set of genes to breed from, and a new page in the Fowldex. Look at what each one can do.'),
     coopIsFull(s) ? h('div', { class: 'banner' }, '🏠', h('span', { class: 'grow' }, 'The coop is full. Retire a chicken to the meadow, or extend the coop below.')) : null,
     h('div', { class: 'grid' }, offers),
     h('div', { class: 'btn-row', style: { marginTop: '10px' } }, h('button', { class: 'btn', onclick: () => {

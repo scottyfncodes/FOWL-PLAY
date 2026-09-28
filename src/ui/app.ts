@@ -4,8 +4,8 @@ import type { Ctx, Tab, UiState } from './ctx';
 import { renderCoop } from './screens/coop';
 import { renderBreed } from './screens/breed';
 import { renderHatchery } from './screens/hatchery';
-import { renderAlmanac } from './screens/almanac';
-import { renderShow } from './screens/show';
+import { renderFowldex } from './screens/almanac';
+import { renderFarm, openOutingPicker } from './screens/farm';
 import { showChickenDetail } from './chickenDetail';
 import { openHatchOverlay } from './hatch';
 import { renderWelcome } from './welcome';
@@ -15,21 +15,23 @@ import { CURRENCY_ICON } from '../data/economy';
 import { TRAIT_BY_ID } from '../data/traits';
 import { BREED_BY_ID } from '../data/breeds';
 import { MILESTONE_BY_ID } from '../data/milestones';
+import { ABILITY_BY_ID } from '../genetics/abilities';
 import { sfx, setSoundEnabled } from '../audio/sfx';
 import { applyTheme } from './theme';
 import type { DiscoveryReport } from '../state/game';
 import type { Chicken } from '../chickens/chicken';
+import { openFarm } from '../farm/play';
 
 const TABS: { id: Tab; label: string; ico: string }[] = [
+  { id: 'farm', label: 'Farm', ico: '🌾' },
   { id: 'coop', label: 'Coop', ico: '🐔' },
   { id: 'breed', label: 'Breed', ico: '🧬' },
+  { id: 'fowldex', label: 'Fowldex', ico: '📖' },
   { id: 'hatchery', label: 'Hatchery', ico: '🏡' },
-  { id: 'almanac', label: 'Almanac', ico: '📖' },
-  { id: 'show', label: 'Show', ico: '🎀' },
 ];
 
 export class App implements Ctx {
-  ui: UiState = { tab: 'coop', parentA: null, parentB: null, coopSort: 'newest', showMeadow: false, almanacTab: 'breeds', highlightId: null };
+  ui: UiState = { tab: 'farm', parentA: null, parentB: null, coopSort: 'newest', showMeadow: false, almanacTab: 'flock', hatcheryTab: 'hatchery', highlightId: null, outingChickenId: null };
   private root: HTMLElement;
   private main: HTMLElement;
   private cornEl: HTMLElement;
@@ -48,7 +50,7 @@ export class App implements Ctx {
     this.main = h('main', { class: 'screen' });
     this.navEl = h('nav', { class: 'nav', 'aria-label': 'Main' });
     this.root.replaceChildren(
-      h('header', { class: 'header' }, h('div', { class: 'brand' }, h('h1', null, 'Fowl Play'), h('small', null, 'field notes')), h('div', { class: 'header-right' }, this.cornEl, h('button', { class: 'icon-btn', 'aria-label': 'Settings', onclick: () => this.openSettings() }, '⚙️'))),
+      h('header', { class: 'header' }, h('div', { class: 'brand' }, h('h1', null, 'Fowl Play'), h('small', null, 'breed it · become it')), h('div', { class: 'header-right' }, this.cornEl, h('button', { class: 'icon-btn', 'aria-label': 'Settings', onclick: () => this.openSettings() }, '⚙️'))),
       this.main,
       this.navEl,
     );
@@ -85,9 +87,9 @@ export class App implements Ctx {
       switch (this.ui.tab) {
         case 'breed': screen = renderBreed(this); break;
         case 'hatchery': screen = renderHatchery(this); break;
-        case 'almanac': screen = renderAlmanac(this); break;
-        case 'show': screen = renderShow(this); break;
-        default: screen = renderCoop(this);
+        case 'fowldex': screen = renderFowldex(this); break;
+        case 'coop': screen = renderCoop(this); break;
+        default: screen = renderFarm(this);
       }
     } catch (err) {
       console.error(err);
@@ -129,6 +131,15 @@ export class App implements Ctx {
     this.navigate('breed');
   }
 
+  playAs(chickenId: string) {
+    closeAllModals();
+    openFarm(this, chickenId);
+  }
+
+  chooseOuting() {
+    openOutingPicker(this);
+  }
+
   openSettings() {
     openSettings(this);
   }
@@ -149,9 +160,13 @@ export class App implements Ctx {
       const tone = top.some((d) => d.rarity === 'legendary') ? 'gold' : top.some((d) => d.rarity === 'rare' || d.rarity === 'exotic') ? 'purple' : 'default';
       toast(`✨ New trait${traitDefs.length > 1 ? 's' : ''}: ${top.map((d) => `${d.emoji} ${d.name}`).join(', ')}${rest > 0 ? ` and ${rest} more` : ''}`, tone);
     }
+    if (report.newAbilities.length > 0) {
+      any = true;
+      toast(`🌾 New ability in the flock: ${report.newAbilities.map((a) => `${ABILITY_BY_ID[a]?.emoji ?? ''} ${ABILITY_BY_ID[a]?.name ?? a}`).join(', ')}`, 'purple');
+    }
     for (const b of report.newBreeds) {
       any = true;
-      toast(`📖 ${BREED_BY_ID[b.id]?.name ?? 'Breed'} added to the Almanac${b.how === 'resemblance' ? ` (${who} looks the part)` : ''}`, 'gold');
+      toast(`📖 ${BREED_BY_ID[b.id]?.name ?? 'Breed'} added to the Fowldex${b.how === 'resemblance' ? ` (${who} looks the part)` : ''}`, 'gold');
     }
     if (report.milestones.length > 0) {
       any = true;

@@ -97,6 +97,7 @@ function sanitizeFarm(input: unknown, chickenCount: number): FarmState {
   f.lore = recordOf(input.lore, (v) => (typeof v === 'number' ? v : null));
   f.cornTaken = strList(input.cornTaken, 2000);
   f.eggsTaken = strList(input.eggsTaken, 200);
+  f.flags = strList(input.flags, 200);
   f.lastChickenId = typeof input.lastChickenId === 'string' ? input.lastChickenId : null;
   f.outings = Math.max(0, Math.floor(num(input.outings, 0)));
   f.nextNo = Math.max(chickenCount + 1, Math.floor(num(input.nextNo, 1)));

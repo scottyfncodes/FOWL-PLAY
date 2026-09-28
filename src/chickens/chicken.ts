@@ -5,7 +5,7 @@ import { BREED_BY_ID, type BreedDef } from '../data/breeds';
 import { makeId } from '../core/ids';
 import type { Rng } from '../core/rng';
 
-export type ChickenOrigin = 'starter' | 'hatchery' | 'hatched' | 'gift';
+export type ChickenOrigin = 'starter' | 'hatchery' | 'hatched' | 'gift' | 'found';
 export type ChickenStatus = 'coop' | 'meadow';
 
 export interface Chicken {
@@ -117,7 +117,7 @@ export function sanitizeChicken(input: unknown): Chicken | null {
     ? ([o.parents[0], o.parents[1]] as [string, string])
     : null;
   const num = (v: unknown, fallback: number) => (typeof v === 'number' && Number.isFinite(v) ? v : fallback);
-  const origin: ChickenOrigin = (['starter', 'hatchery', 'hatched', 'gift'] as const).includes(o.origin as ChickenOrigin) ? (o.origin as ChickenOrigin) : 'hatched';
+  const origin: ChickenOrigin = (['starter', 'hatchery', 'hatched', 'gift', 'found'] as const).includes(o.origin as ChickenOrigin) ? (o.origin as ChickenOrigin) : 'hatched';
   return {
     id: o.id,
     name: typeof o.name === 'string' && o.name.trim() ? o.name.slice(0, 40) : 'Unnamed',

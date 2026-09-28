@@ -87,6 +87,8 @@ export interface FarmState {
   cornTaken: string[];
   /** Mystery eggs already found. */
   eggsTaken: string[];
+  /** World flags that persist between outings: opened gates, revealed tunnels. */
+  flags: string[];
   lastChickenId: string | null;
   outings: number;
   /** Next Fowldex number to hand out. */
@@ -119,5 +121,5 @@ export interface GameState {
 export const SAVE_VERSION = 2;
 
 export function freshFarm(): FarmState {
-  return { missions: {}, clues: {}, discoveredAbilities: {}, lore: {}, cornTaken: [], eggsTaken: [], lastChickenId: null, outings: 0, nextNo: 1 };
+  return { missions: {}, clues: {}, discoveredAbilities: {}, lore: {}, cornTaken: [], eggsTaken: [], flags: [], lastChickenId: null, outings: 0, nextNo: 1 };
 }

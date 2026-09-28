@@ -41,7 +41,7 @@ export function renderCoop(ctx: Ctx): HTMLElement {
     { class: upgradeLevel(s, 'nameplates') > 0 ? 'nameplate' : '' },
     upgradeLevel(s, 'bunting') > 0 ? h('div', { class: 'bunting' }) : null,
     h('div', { class: 'screen-title' }, h('h2', null, 'The Coop'), h('span', { class: 'meta' }, `${coopLoad(s)} / ${coopCapacity(s)} roosts`)),
-    h('p', { class: 'lede' }, coop.length < 3 ? 'Tap a chicken to inspect it. Breed two to see what happens.' : 'Every chicken here is a possible parent. Tap one to inspect its traits and lineage.'),
+    h('p', { class: 'lede' }, coop.length < 3 ? 'Tap a chicken to see what it can do. Breed two to see what their chicks can do.' : 'Every chicken here is a possible parent and a possible hero. Tap one to inspect it, breed it, or take it out.'),
     eggsWaiting > 0 ? h('div', { class: 'banner', role: 'status' }, '🥚', h('span', { class: 'grow' }, `${eggsWaiting} egg${eggsWaiting > 1 ? 's' : ''} waiting in the incubator`), h('button', { class: 'btn sm primary', onclick: () => ctx.navigate('breed') }, 'Hatch')) : null,
     h('div', { class: 'filter-row' }, sortSelect, h('span', { class: 'small muted' }, `${coop.length} in the coop${meadow.length ? `, ${meadow.length} in the meadow` : ''}`)),
     h(

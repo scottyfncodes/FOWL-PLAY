@@ -18,11 +18,11 @@ export default defineConfig({
       manifest: {
         name: 'Fowl Play',
         short_name: 'Fowl Play',
-        description: 'A weird little chicken-breeding discovery game.',
+        description: 'Every problem has a chicken. Breed it. Become it. Solve the farm.',
         theme_color: '#f4ead6',
         background_color: '#f4ead6',
         display: 'standalone',
-        orientation: 'portrait',
+        orientation: 'any',
         start_url: base,
         scope: base,
         icons: [
