@@ -9,6 +9,9 @@ import { ancestryTree } from './ancestryTree';
 import { LOCUS_BY_ID } from '../genetics/loci';
 import { sfx } from '../audio/sfx';
 import { SHOW_CATEGORIES } from '../data/shows';
+import { abilitiesOfChicken } from '../state/farm';
+import { abilityBadgeRow, carrierChips, showAbilityInfo } from './abilityBadges';
+import { MISSIONS } from '../farm/missions';
 
 const CATEGORY_ORDER: TraitCategory[] = ['combo', 'colour', 'pattern', 'feathers', 'head', 'body', 'legs', 'egg', 'utility'];
 const CATEGORY_LABEL: Record<TraitCategory, string> = {
@@ -123,6 +126,9 @@ function detailBody(ctx: Ctx, chicken: Chicken, close: () => void): HTMLElement 
 
   const inCoop = chicken.status === 'coop';
   const pedigreeDepth = upgradeLevel(state, 'pedigree') > 0 ? 3 : 2;
+  const abilities = abilitiesOfChicken(chicken);
+  const solvedHere = MISSIONS.filter((m) => state.farm.missions[m.id]?.chickenId === chicken.id && state.farm.missions[m.id]?.solvedAt);
+  const carriers = carrierChips(chicken);
 
   append(container, [
     h(
@@ -145,6 +151,11 @@ function detailBody(ctx: Ctx, chicken: Chicken, close: () => void): HTMLElement 
     h('p', { class: 'small', style: { marginTop: '10px' } }, parentLine),
     h('p', { class: 'small muted' }, ancestryText),
     chicken.mutations.length > 0 ? h('p', { class: 'mutation-note' }, `🧬 Spontaneous mutation at conception: ${chicken.mutations.map((m) => LOCUS_BY_ID[m]?.name.toLowerCase() ?? m).join(', ')}`) : null,
+    h('div', { class: 'section-h' }, 'On the farm'),
+    abilityBadgeRow(abilities, { big: true, onClick: (def) => showAbilityInfo(def), empty: 'No special abilities. Every chicken can walk, jump a little, peck and hide.' }),
+    carriers ? h('div', { style: { marginTop: '8px' } }, h('span', { class: 'label' }, 'Proven hidden genes'), carriers) : h('p', { class: 'small muted', style: { marginTop: '6px' } }, 'Hidden genes: ??? — breed it and see what the chicks show.'),
+    solvedHere.length ? h('p', { class: 'small', style: { marginTop: '6px' } }, `🏅 ${solvedHere.map((m) => `MISSION COMPLETE: ${m.done}`).join(' ')}`) : null,
+    inCoop ? h('div', { class: 'btn-row', style: { marginTop: '8px' } }, h('button', { class: 'btn primary', onclick: () => { close(); ctx.playAs(chicken.id); } }, '🌾 Take to the farm')) : null,
     h('div', { class: 'detail-egg', style: { marginTop: '10px' } }, eggArt(view), h('div', { class: 'small' }, `Lays ${p.eggSize} ${EGG_WORDS[p.eggColor] ?? p.eggColor}${p.eggSpeckled ? ', speckled' : ''} eggs, ${LAY_WORDS[p.laying]}.`)),
     ...CATEGORY_ORDER.filter((c) => grouped.has(c)).map((c) =>
       h('div', { class: 'trait-group' }, h('span', { class: 'label' }, CATEGORY_LABEL[c]), h('div', { class: 'chips' }, grouped.get(c)!.map((t) => traitChip(t, { onClick: () => showTraitInfo(t) })))),
@@ -176,7 +187,7 @@ export function enterShowPicker(ctx: Ctx, chicken: Chicken) {
       null,
       h('p', { class: 'lede' }, `Which category should ${chicken.name} enter?`),
       SHOW_CATEGORIES.map((cat) =>
-        h('button', { class: 'show-cat', onclick: () => { close(); ctx.navigate('show'); import('./screens/show').then((m) => m.judge(ctx, cat.id, chicken.id)); } }, h('div', { class: 'e' }, cat.emoji), h('div', null, h('div', { class: 't' }, cat.name), h('div', { class: 'd' }, cat.blurb))),
+        h('button', { class: 'show-cat', onclick: () => { close(); ctx.ui.hatcheryTab = 'show'; ctx.navigate('hatchery'); import('./screens/show').then((m) => m.judge(ctx, cat.id, chicken.id)); } }, h('div', { class: 'e' }, cat.emoji), h('div', null, h('div', { class: 't' }, cat.name), h('div', { class: 'd' }, cat.blurb))),
       ),
     ),
   );

@@ -218,11 +218,13 @@ function tailSvg(p: Phenotype, cfg: ShapeCfg, fill: string, ink: string, bodyFil
   }
 }
 
-function legsSvg(p: Phenotype, cfg: ShapeCfg, bodyFill: string, ink: string, legInk: string): string {
+function legsSvg(p: Phenotype, cfg: ShapeCfg, bodyFill: string, ink: string, legInk: string, pose: Pose): string {
   const leg = LEG_COLORS[p.legColor];
+  const stride = pose.stride ?? 0;
+  const tuck = pose.tuck ? 10 : 0;
   const legs: [number, number][] = [
-    [-8, 0],
-    [10, 3],
+    [-8 - stride * 9, 0 - tuck - (stride > 0 ? 4 : 0)],
+    [10 + stride * 9, 3 - tuck - (stride < 0 ? 4 : 0)],
   ];
   const top = -(cfg.legLen + cfg.ry * 0.55);
   let s = '';
@@ -266,9 +268,26 @@ function legsSvg(p: Phenotype, cfg: ShapeCfg, bodyFill: string, ink: string, leg
   return s;
 }
 
+/** Body pose for sprite frames. */
+export interface Pose {
+  /** -1..1: legs apart in a stride. */
+  stride?: number;
+  /** Legs tucked up (jumping). */
+  tuck?: boolean;
+  /** Degrees the wing is lifted (flapping / gliding). */
+  wingLift?: number;
+  /** Beak pushed forward and down (pecking). */
+  peck?: boolean;
+  /** Head thrown back (crowing). */
+  crow?: boolean;
+}
+
 export interface ChickenSvgOptions {
   /** Unique id used for clip paths; defaults to a hash of the seed. */
   uid?: string;
+  pose?: Pose;
+  /** Draw only the figure (no shadow) for sprite sheets. */
+  sprite?: boolean;
   /** Add a CSS class for animation hooks. */
   className?: string;
   /** Draw a soft ground shadow. */
@@ -278,6 +297,7 @@ export interface ChickenSvgOptions {
 /** Render a chicken as an inline SVG string. Pure: same phenotype+seed → same picture. */
 export function chickenSvg(p: Phenotype, seed: number, opts: ChickenSvgOptions = {}): string {
   const uid = opts.uid ?? `c${(seed >>> 0).toString(36)}`;
+  const pose: Pose = opts.pose ?? {};
   const cfg = shapeCfg(p);
   const body = COLORS[p.primary];
   const hackle = COLORS[p.hackle];
@@ -293,8 +313,10 @@ export function chickenSvg(p: Phenotype, seed: number, opts: ChickenSvgOptions =
   const frizz = p.featherType === 'frizzle' || p.featherType === 'sizzle';
   const frazzle = p.featherType === 'frazzle';
 
-  const bodyCy = -(cfg.legLen + cfg.ry * 0.9);
-  const [hx, hy] = [cfg.head[0], cfg.head[1] + bodyCy + cfg.ry * 0.9 - 8];
+  const bodyCy = -(cfg.legLen + cfg.ry * 0.9) + (pose.tuck ? 6 : 0);
+  const headDx = pose.peck ? -10 : pose.crow ? 6 : 0;
+  const headDy = pose.peck ? 14 : pose.crow ? -10 : 0;
+  const [hx, hy] = [cfg.head[0] + headDx, cfg.head[1] + bodyCy + cfg.ry * 0.9 - 8 + headDy];
   const [nx, ny] = [cfg.neckBase[0], cfg.neckBase[1] + bodyCy];
   const [tx, ty] = [cfg.tailBase[0], cfg.tailBase[1] + bodyCy];
   const tailCfg: ShapeCfg = { ...cfg, tailBase: [tx, ty] };
@@ -302,13 +324,13 @@ export function chickenSvg(p: Phenotype, seed: number, opts: ChickenSvgOptions =
   const parts: string[] = [];
 
   // shadow
-  if (opts.shadow !== false) parts.push(`<ellipse cx="4" cy="4" rx="${fmt(cfg.rx * 1.1)}" ry="7" fill="#2b2118" opacity="0.12"/>`);
+  if (opts.shadow !== false && !opts.sprite) parts.push(`<ellipse cx="4" cy="4" rx="${fmt(cfg.rx * 1.1)}" ry="7" fill="#2b2118" opacity="0.12"/>`);
 
   // tail (behind body)
   parts.push(tailSvg(p, tailCfg, tail.fill, tail.ink, body.fill));
 
   // back leg (behind body)
-  parts.push(`<g>${legsSvg(p, cfg, body.fill, ink, body.ink)}</g>`);
+  parts.push(`<g>${legsSvg(p, cfg, body.fill, ink, body.ink, pose)}</g>`);
 
   // body group
   const bodyGroup: string[] = [];
@@ -320,7 +342,8 @@ export function chickenSvg(p: Phenotype, seed: number, opts: ChickenSvgOptions =
   const wrx = cfg.rx * 0.55;
   const wry = cfg.ry * 0.42;
   const wingPath = `M${fmt(-wrx * 0.6)} ${fmt(-wry * 0.6)} q${fmt(wrx * 1.3)} ${fmt(-wry * 0.6)} ${fmt(wrx * 1.5)} ${fmt(wry * 0.8)} q${fmt(-wrx * 0.5)} ${fmt(wry * 1.1)} ${fmt(-wrx * 1.4)} ${fmt(wry * 0.4)} z`;
-  bodyGroup.push(`<g transform="rotate(${cfg.tilt})"><path d="${wingPath}" fill="${body.fill}" stroke="${body.ink}" stroke-width="1.1"/><path d="${wingPath}" fill="${body.ink}" opacity="0.1"/>`);
+  const lift = pose.wingLift ?? 0;
+  bodyGroup.push(`<g transform="rotate(${cfg.tilt})${lift ? ` rotate(${fmt(-lift)} ${fmt(wrx * 0.6)} ${fmt(-wry * 0.6)})` : ''}"><path d="${wingPath}" fill="${body.fill}" stroke="${body.ink}" stroke-width="1.1"/><path d="${wingPath}" fill="${body.ink}" opacity="0.1"/>`);
   if (wing.fill !== body.fill) bodyGroup.push(`<path d="M${fmt(-wrx * 0.5)} ${fmt(wry * 0.95)} q${fmt(wrx * 0.8)} ${fmt(wry * 0.45)} ${fmt(wrx * 1.35)} ${fmt(wry * 0.15)}" fill="none" stroke="${wing.fill}" stroke-width="3.5" stroke-linecap="round" opacity="0.9"/>`);
   if (p.barred && p.pattern !== 'columbian') bodyGroup.push(`<g clip-path="url(#${clipId})">${[-8, 2, 12].map((y) => `<rect x="${fmt(-wrx)}" y="${fmt(y)}" width="${fmt(wrx * 2)}" height="4" fill="${COLORS[p.marking].fill}" opacity="0.85"/>`).join('')}</g>`);
   bodyGroup.push('</g>');
@@ -356,8 +379,9 @@ export function chickenSvg(p: Phenotype, seed: number, opts: ChickenSvgOptions =
   }
   // wattles
   if (!p.beard) parts.push(`<ellipse cx="${fmt(hx - 6)}" cy="${fmt(hy + 15)}" rx="3.2" ry="5" fill="${skin.comb}" stroke="${skin.comb === '#d8402f' ? '#8c2418' : '#1f191f'}" stroke-width="0.8"/>`);
-  // beak
-  parts.push(`<path d="M${fmt(hx - 13)} ${fmt(hy - 2)} l-13 4 l13 5 z" fill="${p.skin === 'black' ? '#3d353d' : '#e0b04c'}" stroke="${p.skin === 'black' ? '#1f191f' : '#8f6a1c'}" stroke-width="1"/>`);
+  // beak (open when crowing)
+  if (pose.crow) parts.push(`<path d="M${fmt(hx - 13)} ${fmt(hy - 3)} l-13 -4 l12 6 z M${fmt(hx - 13)} ${fmt(hy + 1)} l-12 8 l13 -3 z" fill="${p.skin === 'black' ? '#3d353d' : '#e0b04c'}" stroke="${p.skin === 'black' ? '#1f191f' : '#8f6a1c'}" stroke-width="1"/>`);
+  else parts.push(`<path d="M${fmt(hx - 13)} ${fmt(hy - 2)} l-13 4 l13 5 z" fill="${p.skin === 'black' ? '#3d353d' : '#e0b04c'}" stroke="${p.skin === 'black' ? '#1f191f' : '#8f6a1c'}" stroke-width="1"/>`);
   // eye
   parts.push(`<circle cx="${fmt(hx - 6)}" cy="${fmt(hy - 4)}" r="3" fill="#1c1a1e"/><circle cx="${fmt(hx - 7)}" cy="${fmt(hy - 5)}" r="1" fill="#fff"/>`);
   // comb

@@ -1,45 +1,51 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#f7e9c8"/>
-      <stop offset="1" stop-color="#e5c98f"/>
+      <stop offset="0" stop-color="#f7ecd2"/>
+      <stop offset="1" stop-color="#e9c98f"/>
     </linearGradient>
     <linearGradient id="helix" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#7a8f5a"/>
-      <stop offset="1" stop-color="#4f6b3a"/>
+      <stop offset="0" stop-color="#3f6fb6"/>
+      <stop offset="1" stop-color="#8a4db8"/>
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="112" fill="url(#bg)"/>
-  <!-- DNA helix, subtle, behind the chicken -->
-  <g stroke="url(#helix)" stroke-width="14" fill="none" stroke-linecap="round" opacity="0.55">
-    <path d="M392 70 C332 130 332 190 392 250 C452 310 452 370 392 430"/>
-    <path d="M452 70 C512 130 512 190 452 250 C392 310 392 370 452 430"/>
-    <path d="M404 106 h36 M398 160 h48 M404 214 h36 M404 286 h36 M398 340 h48 M404 394 h36"/>
+  <!-- helix behind the chicken: the breeding cue -->
+  <g fill="none" stroke="url(#helix)" stroke-width="20" stroke-linecap="round" opacity="0.8">
+    <path d="M96 96 C 160 150, 160 210, 96 264 C 32 318, 32 378, 96 432"/>
+    <path d="M176 96 C 112 150, 112 210, 176 264 C 240 318, 240 378, 176 432"/>
   </g>
-  <!-- ground shadow -->
-  <ellipse cx="236" cy="432" rx="150" ry="18" fill="#2b2118" opacity="0.14"/>
+  <g stroke="url(#helix)" stroke-width="16" stroke-linecap="round" opacity="0.8">
+    <path d="M112 128 L160 128"/><path d="M112 232 L160 232"/><path d="M112 296 L160 296"/><path d="M112 400 L160 400"/>
+  </g>
   <!-- tail -->
-  <path d="M330 262 q70 -70 60 -130 q-20 60 -80 100 z" fill="#c8553d" stroke="#5e2012" stroke-width="8" stroke-linejoin="round"/>
-  <path d="M334 278 q90 -40 100 -110 q-40 50 -104 78 z" fill="#d9a441" stroke="#8f5b16" stroke-width="8" stroke-linejoin="round"/>
-  <!-- legs -->
-  <path d="M212 392 v40 M268 392 v40 M180 434 h64 M236 434 h64" stroke="#e2b33a" stroke-width="16" stroke-linecap="round" fill="none"/>
-  <path d="M212 392 v40 M268 392 v40 M180 434 h64 M236 434 h64" stroke="#8f5b16" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.5"/>
+  <g fill="#c8553d" stroke="#2b2118" stroke-width="10" stroke-linejoin="round">
+    <path d="M150 300 C 120 230, 130 170, 190 150 C 175 205, 190 240, 235 260 Z"/>
+    <path d="M165 320 C 130 270, 128 210, 172 190 C 168 240, 190 270, 235 285 Z" fill="#d9a441"/>
+  </g>
   <!-- body -->
-  <ellipse cx="240" cy="300" rx="130" ry="102" fill="#f8f4ea" stroke="#2b2118" stroke-width="10"/>
-  <path d="M170 290 q70 -30 120 20 q-30 60 -110 40 z" fill="#efe6d2" stroke="#2b2118" stroke-width="8" stroke-linejoin="round"/>
-  <!-- neck + head -->
-  <path d="M118 262 Q96 190 132 128 L184 138 Q176 200 168 264 z" fill="#f8f4ea" stroke="#2b2118" stroke-width="10" stroke-linejoin="round"/>
-  <circle cx="152" cy="132" r="58" fill="#f8f4ea" stroke="#2b2118" stroke-width="10"/>
+  <ellipse cx="292" cy="318" rx="146" ry="112" fill="#fbf6ea" stroke="#2b2118" stroke-width="12"/>
+  <!-- wing -->
+  <path d="M250 300 C 300 260, 380 280, 400 330 C 360 350, 300 360, 250 300 Z" fill="#efe4cc" stroke="#2b2118" stroke-width="9" stroke-linejoin="round"/>
+  <!-- neck & head -->
+  <path d="M340 240 C 330 190, 350 140, 400 130 L 440 150 C 460 210, 440 250, 392 262 Z" fill="#fbf6ea" stroke="#2b2118" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="416" cy="176" r="58" fill="#fbf6ea" stroke="#2b2118" stroke-width="12"/>
   <!-- comb -->
-  <path d="M112 92 l10 -34 l14 26 l14 -40 l14 30 l12 -30 l10 24 l8 -14 l4 40 z" fill="#c8553d" stroke="#5e2012" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M378 132 l12 -38 l16 28 l14 -40 l14 34 l16 -30 l8 42 z" fill="#d8402f" stroke="#2b2118" stroke-width="9" stroke-linejoin="round"/>
   <!-- wattle -->
-  <ellipse cx="128" cy="190" rx="14" ry="22" fill="#c8553d" stroke="#5e2012" stroke-width="6"/>
+  <path d="M432 224 c 18 6, 22 30, 6 40 c -16 8, -30 -12, -22 -30 z" fill="#d8402f" stroke="#2b2118" stroke-width="8"/>
   <!-- beak -->
-  <path d="M100 120 l-48 18 l48 20 z" fill="#e0b04c" stroke="#8f6a1c" stroke-width="8" stroke-linejoin="round"/>
-  <!-- eye -->
-  <circle cx="132" cy="122" r="12" fill="#1c1a1e"/>
-  <circle cx="128" cy="118" r="4" fill="#fff"/>
-  <!-- little flask / lab hint: egg with question mark -->
-  <path d="M318 396 C336 396 350 376 350 354 C350 330 336 306 318 306 C300 306 286 330 286 354 C286 376 300 396 318 396 z" fill="#a9d3d6" stroke="#2b2118" stroke-width="8"/>
-  <text x="318" y="372" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="46" fill="#2b2118">?</text>
+  <path d="M464 168 l52 14 l-52 20 z" fill="#e0b04c" stroke="#2b2118" stroke-width="9" stroke-linejoin="round"/>
+  <!-- eye: big, expressive, slightly suspicious -->
+  <circle cx="428" cy="168" r="17" fill="#2b2118"/>
+  <circle cx="434" cy="161" r="6" fill="#ffffff"/>
+  <path d="M404 142 q 26 -12 50 -2" fill="none" stroke="#2b2118" stroke-width="8" stroke-linecap="round"/>
+  <!-- legs -->
+  <g stroke="#e0b04c" stroke-width="16" stroke-linecap="round" fill="none">
+    <path d="M262 424 L262 470"/><path d="M322 424 L322 470"/>
+    <path d="M232 470 L262 470 L292 470"/><path d="M292 470 L322 470 L352 470"/>
+  </g>
+  <g stroke="#2b2118" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.5">
+    <path d="M262 424 L262 470"/><path d="M322 424 L322 470"/>
+  </g>
 </svg>

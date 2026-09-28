@@ -1,8 +1,12 @@
 import { sanitizeChicken, type Chicken } from '../chickens/chicken';
-import { SAVE_VERSION, type Egg, type GameState, type HatcheryOffer } from '../state/types';
+import { SAVE_VERSION, freshFarm, type Egg, type FarmState, type GameState, type HatcheryOffer, type MissionProgress } from '../state/types';
 
 export const SAVE_KEY = 'fowlplay.save';
 export const BACKUP_KEY = 'fowlplay.save.backup';
+
+const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
+const num = (v: unknown, fallback: number) => (typeof v === 'number' && Number.isFinite(v) ? v : fallback);
+const strList = (v: unknown, max = 500): string[] => (Array.isArray(v) ? (v.filter((x) => typeof x === 'string') as string[]).slice(0, max) : []);
 
 interface Envelope {
   app: 'fowl-play';
@@ -16,7 +20,20 @@ interface Envelope {
  * Each entry migrates from index+1 to index+2 (i.e. MIGRATIONS[0] is v1→v2).
  * Add a new function here whenever SAVE_VERSION is bumped.
  */
-export const MIGRATIONS: ((state: Record<string, unknown>) => Record<string, unknown>)[] = [];
+export const MIGRATIONS: ((state: Record<string, unknown>) => Record<string, unknown>)[] = [
+  // v1 → v2: the farm arrives. Existing chickens get Fowldex numbers in hatch order.
+  (state) => {
+    const chickens = Array.isArray(state.chickens) ? [...(state.chickens as Record<string, unknown>[])] : [];
+    const ordered = chickens.filter(isObj).sort((a, b) => num(a.born, 0) - num(b.born, 0));
+    let no = 1;
+    for (const c of ordered) {
+      if (!c.no) c.no = no;
+      no++;
+    }
+    const farm = isObj(state.farm) ? state.farm : {};
+    return { ...state, farm: { ...farm, nextNo: Math.max(no, num(farm.nextNo, 1)) } };
+  },
+];
 
 export function migrate(raw: Record<string, unknown>, fromVersion: number): Record<string, unknown> {
   let state = raw;
@@ -28,8 +45,6 @@ export function migrate(raw: Record<string, unknown>, fromVersion: number): Reco
   return state;
 }
 
-const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
-const num = (v: unknown, fallback: number) => (typeof v === 'number' && Number.isFinite(v) ? v : fallback);
 
 function sanitizeEgg(input: unknown, known: Set<string>): Egg | null {
   if (!isObj(input)) return null;
@@ -57,6 +72,36 @@ function recordOf<T>(input: unknown, each: (v: unknown) => T | null): Record<str
     if (r !== null) out[k] = r;
   }
   return out;
+}
+
+function sanitizeFarm(input: unknown, chickenCount: number): FarmState {
+  const f = freshFarm();
+  if (!isObj(input)) {
+    f.nextNo = chickenCount + 1;
+    return f;
+  }
+  f.missions = recordOf(input.missions, (v): MissionProgress | null =>
+    isObj(v)
+      ? {
+          discoveredAt: num(v.discoveredAt, 0),
+          solvedAt: typeof v.solvedAt === 'number' ? v.solvedAt : null,
+          chickenId: typeof v.chickenId === 'string' ? v.chickenId : null,
+          chickenName: typeof v.chickenName === 'string' ? v.chickenName : null,
+          method: typeof v.method === 'string' ? v.method : null,
+          attempts: Math.max(0, Math.floor(num(v.attempts, 0))),
+        }
+      : null,
+  );
+  f.clues = recordOf(input.clues, (v) => (Array.isArray(v) ? strList(v, 40) : null));
+  f.discoveredAbilities = recordOf(input.discoveredAbilities, (v) => (isObj(v) ? { at: num(v.at, 0), chickenId: String(v.chickenId ?? '') } : null));
+  f.lore = recordOf(input.lore, (v) => (typeof v === 'number' ? v : null));
+  f.cornTaken = strList(input.cornTaken, 2000);
+  f.eggsTaken = strList(input.eggsTaken, 200);
+  f.flags = strList(input.flags, 200);
+  f.lastChickenId = typeof input.lastChickenId === 'string' ? input.lastChickenId : null;
+  f.outings = Math.max(0, Math.floor(num(input.outings, 0)));
+  f.nextNo = Math.max(chickenCount + 1, Math.floor(num(input.nextNo, 1)));
+  return f;
 }
 
 /** Turn an untrusted object into a fully valid GameState, dropping anything broken. */
@@ -88,6 +133,11 @@ export function sanitizeState(input: unknown, fresh: () => GameState): GameState
   const offers = Array.isArray(hatchery.offers) ? hatchery.offers.map(sanitizeOffer).filter((o): o is HatcheryOffer => o !== null) : [];
   const stats = isObj(input.stats) ? input.stats : {};
   const settings = isObj(input.settings) ? input.settings : {};
+  const farm = sanitizeFarm(input.farm, chickens.length + eggs.length);
+  // Any chicken without a Fowldex number gets the next one, oldest first.
+  for (const c of [...chickens].sort((a, b) => a.born - b.born)) {
+    if (!c.no) c.no = farm.nextNo++;
+  }
   const onboarding = (['welcome', 'pickSecond', 'firstBreed', 'done'] as const).includes(input.onboarding as GameState['onboarding']) ? (input.onboarding as GameState['onboarding']) : chickens.length > 0 ? 'done' : 'welcome';
   return {
     version: SAVE_VERSION,
@@ -134,6 +184,7 @@ export function sanitizeState(input: unknown, fresh: () => GameState): GameState
     onboarding,
     settings: { sound: settings.sound !== false },
     starterId: typeof input.starterId === 'string' ? input.starterId : null,
+    farm,
   };
 }
 

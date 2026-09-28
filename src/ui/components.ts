@@ -4,6 +4,8 @@ import { ancestryLabel, viewOf, type Chicken, type ChickenView } from '../chicke
 import { TRAIT_BY_ID, type TraitDef } from '../data/traits';
 import { RARITY_LABEL } from '../genetics/traits';
 import { sfx } from '../audio/sfx';
+import { abilitiesOf } from '../genetics/abilities';
+import { abilityBadgeRow } from './abilityBadges';
 
 // ---------------------------------------------------------------------------
 // Modal
@@ -141,7 +143,8 @@ export function chickenCard(chicken: Chicken, opts: { onClick?: (c: Chicken) => 
     chickenArt(view),
     h('div', { class: 'name' }, chicken.name, chicken.favorite ? h('span', { class: 'fav' }, '⭐') : null),
     h('div', { class: 'sub' }, ancestryLabel(chicken)),
-    h('div', { class: 'tags' }, notableTraits(view, opts.maxTraits ?? 3).map((id) => traitChip(id))),
+    abilityBadgeRow(abilitiesOf(view.phenotype), { max: 5 }),
+    h('div', { class: 'tags' }, notableTraits(view, opts.maxTraits ?? 2).map((id) => traitChip(id))),
     opts.extra ?? null,
   );
   return card;

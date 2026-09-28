@@ -12,6 +12,8 @@ import { RARITY_LABEL } from '../genetics/traits';
 import { LOCUS_BY_ID } from '../genetics/loci';
 import { CURRENCY_ICON } from '../data/economy';
 import type { Egg } from '../state/types';
+import { ABILITY_BY_ID, CARRIER_GENES, abilitiesOf } from '../genetics/abilities';
+import { abilityBadgeRow, showAbilityInfo } from './abilityBadges';
 
 /**
  * The hatch sequence: tap the egg three times (or wait), it cracks, the chick
@@ -156,6 +158,16 @@ export function revealCard(ctx: Ctx, chicken: Chicken, report: DiscoveryReport, 
     if (def) addDisc('', '🏅 Milestone', `${def.emoji} ${def.name}`, def.description);
   }
   if (report.mutated) addDisc('rare-d', '🧬 Mutation', 'Something changed on its own', `A spontaneous change at: ${chicken.mutations.map((m) => LOCUS_BY_ID[m]?.name.toLowerCase() ?? m).join(', ')}. This was not inherited from either parent.`);
+  for (const id of report.newAbilities) {
+    const def = ABILITY_BY_ID[id];
+    if (def && !def.flaw) addDisc('rare-d', '🌾 New ability in the flock', `${def.emoji} ${def.name}`, def.does);
+  }
+  const byGene = new Map<string, string[]>();
+  for (const pc of report.provenCarriers) byGene.set(pc.abilityId, [...(byGene.get(pc.abilityId) ?? []), pc.parentName]);
+  for (const [abilityId, names] of byGene) {
+    const gene = CARRIER_GENES.find((g) => g.abilityId === abilityId);
+    addDisc('', '🧬 Hidden gene revealed', `${names.join(' and ')} ${names.length > 1 ? 'carry' : 'carries'} ${gene?.name ?? abilityId}`, `${chicken.name} shows it, so the parents must have been carrying it all along. Write that down: it changes who to breed next.`);
+  }
 
   const card = h(
     'div',
@@ -164,6 +176,7 @@ export function revealCard(ctx: Ctx, chicken: Chicken, report: DiscoveryReport, 
     h('h2', null, chicken.name),
     h('div', { class: 'sub' }, `${ancestryLabel(chicken)} · Generation ${chicken.generation} · `, h('span', { class: `rarity-text ${view.rarity.tier}` }, RARITY_LABEL[view.rarity.tier])),
     h('div', { class: 'sub personality' }, view.phenotype.personality.map((x) => x[0]!.toUpperCase() + x.slice(1)).join(' · ')),
+    abilityBadgeRow(abilitiesOf(view.phenotype), { big: true, onClick: (def) => showAbilityInfo(def) }),
     h('div', { class: 'chips' }, chips),
     ...discoveries,
     commonNew.length ? h('p', { class: 'small muted', style: { marginTop: '10px' } }, `Also new to the Almanac: ${commonNew.join(', ')}.`) : null,
@@ -172,6 +185,7 @@ export function revealCard(ctx: Ctx, chicken: Chicken, report: DiscoveryReport, 
       'div',
       { class: 'actions' },
       h('button', { class: 'btn primary big', onclick: () => { sfx.select(); onDone(); ctx.ui.highlightId = chicken.id; ctx.navigate('coop'); } }, opts.doneLabel ?? '🏠 Add to coop'),
+      h('button', { class: 'btn', onclick: () => { sfx.select(); onDone(); ctx.playAs(chicken.id); } }, '🌾 Take it to the farm'),
       h('button', { class: 'btn', onclick: () => { sfx.select(); onDone(); ctx.breedWith(chicken.id); } }, '🧬 Breed this one next'),
       h('button', { class: 'btn ghost', onclick: () => { onDone(); ctx.showChicken(chicken.id); } }, 'Inspect'),
     ),

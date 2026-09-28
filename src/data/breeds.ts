@@ -1,4 +1,5 @@
 import type { LocusId } from '../genetics/loci';
+import { ABILITY_GENES } from './abilityGenes';
 
 /**
  * Real-world chicken breeds, each given a simplified game genotype that
@@ -843,6 +844,9 @@ export const BREEDS: BreedDef[] = [
     signature: ['body.bantam', 'col.buff', 'pat.columbian', '!head.beard'],
   },
 ];
+
+// Fold the farm ability genes into every breed's genotype.
+for (const b of BREEDS) Object.assign(b.genotype, ABILITY_GENES[b.id] ?? {});
 
 export const BREED_BY_ID: Record<string, BreedDef> = Object.fromEntries(BREEDS.map((b) => [b.id, b]));
 

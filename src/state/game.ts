@@ -9,7 +9,9 @@ import { TRAIT_BY_ID } from '../data/traits';
 import { MILESTONES, type MilestoneContext } from '../data/milestones';
 import { HATCHERY_FREE_REFRESH_EVERY, HATCHERY_PRICE, HATCHERY_REFRESH_COST, HATCHERY_SLOTS, REWARDS, STARTING_COOP_SLOTS, STARTING_CORN, STARTING_INCUBATOR_SLOTS, UPGRADE_BY_ID, COOP_THEMES } from '../data/economy';
 import { RIBBON_REWARD, SHOW_BY_ID, ribbonFor, type Ribbon } from '../data/shows';
-import { SAVE_VERSION, type DiscoveryEvent, type Egg, type GameState, type HatcheryOffer } from './types';
+import { SAVE_VERSION, freshFarm, type DiscoveryEvent, type Egg, type GameState, type HatcheryOffer } from './types';
+import { abilitiesOf, abilityIds, CARRIER_GENES } from '../genetics/abilities';
+import { copies } from '../genetics/loci';
 
 // ---------------------------------------------------------------------------
 // Fresh game
@@ -38,6 +40,7 @@ export function freshState(): GameState {
     onboarding: 'welcome',
     settings: { sound: true },
     starterId: null,
+    farm: freshFarm(),
   };
 }
 
@@ -74,10 +77,14 @@ export interface DiscoveryReport {
   milestones: string[];
   corn: number;
   mutated: boolean;
+  /** Farm abilities never seen in this flock before. */
+  newAbilities: string[];
+  /** Parents proven to carry a hidden gene by this chick: [parentId, abilityId]. */
+  provenCarriers: { parentId: string; parentName: string; abilityId: string }[];
 }
 
 function emptyReport(): DiscoveryReport {
-  return { newTraits: [], newBreeds: [], milestones: [], corn: 0, mutated: false };
+  return { newTraits: [], newBreeds: [], milestones: [], corn: 0, mutated: false, newAbilities: [], provenCarriers: [] };
 }
 
 function pushLog(s: GameState, e: DiscoveryEvent) {
@@ -90,6 +97,34 @@ export function registerChicken(s: GameState, chicken: Chicken, viaHatch: boolea
   const report = emptyReport();
   const view = viewOf(chicken);
   const now = Date.now();
+  if (!chicken.no) {
+    chicken.no = s.farm.nextNo;
+    s.farm.nextNo += 1;
+  }
+
+  // Farm abilities: what can this one actually do?
+  const abilities = abilitiesOf(view.phenotype);
+  for (const id of abilityIds(abilities)) {
+    if (!s.farm.discoveredAbilities[id]) {
+      s.farm.discoveredAbilities[id] = { at: now, chickenId: chicken.id };
+      report.newAbilities.push(id);
+      pushLog(s, { kind: 'ability', refId: id, chickenId: chicken.id, at: now, corn: 0 });
+    }
+  }
+  // Hidden genes: a chick that expresses a recessive proves both parents carry it.
+  if (viaHatch && chicken.parents) {
+    for (const gene of CARRIER_GENES) {
+      if (copies(chicken.genotype, gene.locus, gene.allele) !== 2) continue;
+      for (const pid of chicken.parents) {
+        const parent = chickenById(s, pid);
+        if (!parent || copies(parent.genotype, gene.locus, gene.allele) === 2) continue; // parent shows it already
+        if (parent.knownGenes.includes(gene.abilityId)) continue;
+        parent.knownGenes.push(gene.abilityId);
+        report.provenCarriers.push({ parentId: parent.id, parentName: parent.name, abilityId: gene.abilityId });
+        pushLog(s, { kind: 'carrier', refId: gene.abilityId, chickenId: parent.id, at: now, corn: 0 });
+      }
+    }
+  }
 
   for (const t of view.traits) {
     if (!s.discoveredTraits[t]) {

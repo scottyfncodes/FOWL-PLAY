@@ -12,6 +12,13 @@ import type { Ctx } from '../ctx';
 import { CURRENCY_ICON } from '../../data/economy';
 import { showTraitInfo } from '../chickenDetail';
 import { SHOW_BY_ID } from '../../data/shows';
+import { ABILITIES, ABILITY_BY_ID, CARRIER_GENES } from '../../genetics/abilities';
+import { abilityBadgeRow, showAbilityInfo } from '../abilityBadges';
+import { chickenArt } from '../components';
+import { viewOf, type Chicken } from '../../chickens/chicken';
+import { abilitiesOfChicken } from '../../state/farm';
+import { LORE, MISSIONS } from '../../farm/missions';
+import { sfx } from '../../audio/sfx';
 
 const CAT_ORDER: TraitCategory[] = ['colour', 'pattern', 'feathers', 'head', 'body', 'legs', 'egg', 'combo', 'personality', 'utility'];
 const CAT_LABEL: Record<TraitCategory, string> = { colour: 'Colours', pattern: 'Patterns', feathers: 'Feathers', head: 'Heads & combs', body: 'Bodies & tails', legs: 'Legs & feet', egg: 'Eggs', combo: 'Rare combinations', personality: 'Personalities', utility: 'Hardiness' };
@@ -27,15 +34,97 @@ export function breedArt(b: BreedDef): string {
   return svg;
 }
 
-export function renderAlmanac(ctx: Ctx): HTMLElement {
+export function renderFowldex(ctx: Ctx): HTMLElement {
   const tabs = h(
     'div',
     { class: 'subtabs', role: 'tablist' },
-    ...(['breeds', 'traits', 'milestones'] as const).map((t) => h('button', { class: ctx.ui.almanacTab === t ? 'active' : '', role: 'tab', onclick: () => { ctx.ui.almanacTab = t; ctx.rerender(); } }, { breeds: 'Breeds', traits: 'Traits', milestones: 'Milestones' }[t])),
+    ...(['flock', 'abilities', 'breeds', 'traits', 'milestones'] as const).map((t) => h('button', { class: ctx.ui.almanacTab === t ? 'active' : '', role: 'tab', onclick: () => { sfx.tap(); ctx.ui.almanacTab = t; ctx.rerender(); } }, { flock: 'Flock', abilities: 'Abilities', breeds: 'Breeds', traits: 'Traits', milestones: 'Milestones' }[t])),
   );
-  const body = ctx.ui.almanacTab === 'breeds' ? breedsTab(ctx) : ctx.ui.almanacTab === 'traits' ? traitsTab(ctx) : milestonesTab(ctx);
-  return h('div', null, h('div', { class: 'screen-title' }, h('h2', null, 'Chicken Almanac')), h('p', { class: 'lede' }, 'A field guide to everything you have found, and silhouettes of everything you have not.'), tabs, body);
+  const body = ctx.ui.almanacTab === 'flock' ? flockTab(ctx) : ctx.ui.almanacTab === 'abilities' ? abilitiesTab(ctx) : ctx.ui.almanacTab === 'breeds' ? breedsTab(ctx) : ctx.ui.almanacTab === 'traits' ? traitsTab(ctx) : milestonesTab(ctx);
+  return h('div', null, h('div', { class: 'screen-title' }, h('h2', null, 'Fowldex')), h('p', { class: 'lede' }, 'Every chicken you have made, everything they can do, and silhouettes of everything you have not found yet.'), tabs, body);
 }
+
+// ---------------------------------------------------------------------------
+// Flock: numbered entries for every chicken that ever joined
+// ---------------------------------------------------------------------------
+
+function flockTab(ctx: Ctx): HTMLElement {
+  const s = ctx.state;
+  const all = [...s.chickens].sort((a, b) => a.no - b.no);
+  const byId = new Map(all.map((c) => [c.id, c]));
+  const solvedBy = new Map<string, string[]>();
+  for (const m of MISSIONS) {
+    const p = s.farm.missions[m.id];
+    if (p?.solvedAt && p.chickenId) solvedBy.set(p.chickenId, [...(solvedBy.get(p.chickenId) ?? []), m.done]);
+  }
+  const entry = (c: Chicken) => {
+    const v = viewOf(c);
+    const a = abilitiesOfChicken(c);
+    const parents = c.parents ? c.parents.map((id) => byId.get(id)) : null;
+    const carriers = c.knownGenes.map((g) => CARRIER_GENES.find((x) => x.abilityId === g)?.name ?? g);
+    const unproven = CARRIER_GENES.filter((g) => !c.knownGenes.includes(g.abilityId)).length;
+    const done = solvedBy.get(c.id) ?? [];
+    return h(
+      'button',
+      { class: `dex-entry ${c.status === 'meadow' ? 'meadow' : ''}`, type: 'button', onclick: () => ctx.showChicken(c.id) },
+      h('div', { class: 'no' }, `#${String(c.no).padStart(3, '0')}`),
+      chickenArt(v, 'art'),
+      h(
+        'div',
+        { class: 'body' },
+        h('div', { class: 'name' }, c.name.toUpperCase(), c.favorite ? ' ⭐' : ''),
+        h('div', { class: 'sub' }, `Generation ${c.generation}${c.status === 'meadow' ? ' · in the meadow' : ''}`),
+        h('div', { class: 'dex-line' }, h('span', { class: 'label' }, 'Can'), abilityBadgeRow(a, { max: 8, empty: 'nothing special. Yet.' })),
+        h('div', { class: 'dex-line' }, h('span', { class: 'label' }, 'Hidden'), h('span', { class: 'small' }, carriers.length ? `carries ${carriers.join(', ')}${unproven ? ' · ???' : ''}` : '???')),
+        parents ? h('div', { class: 'dex-line' }, h('span', { class: 'label' }, 'Parents'), h('span', { class: 'small' }, parents.map((p) => (p ? `#${String(p.no).padStart(3, '0')} ${p.name}` : 'a departed chicken')).join(' × '))) : h('div', { class: 'dex-line' }, h('span', { class: 'label' }, 'Origin'), h('span', { class: 'small' }, c.origin === 'found' ? 'Hatched from a mystery egg' : c.origin === 'hatchery' ? 'Adopted' : c.origin === 'starter' ? 'Your first chicken' : 'Chosen on day one')),
+        done.length ? h('div', { class: 'dex-line' }, h('span', { class: 'label' }, 'Solved'), h('span', { class: 'small' }, done.join(' '))) : null,
+      ),
+    );
+  };
+  const placeholders = [0, 1, 2].map((i) => h('div', { class: 'dex-entry locked' }, h('div', { class: 'no' }, `#${String(s.farm.nextNo + i).padStart(3, '0')}`), h('div', { class: 'art silhouette' }, '🐔'), h('div', { class: 'body' }, h('div', { class: 'name' }, '???'), h('div', { class: 'sub' }, 'Not yet hatched'))));
+  return h(
+    'div',
+    null,
+    h('div', { class: 'small', style: { display: 'flex', justifyContent: 'space-between' } }, h('b', null, `${all.length} chickens recorded`), h('span', { class: 'muted' }, `${all.filter((c) => c.knownGenes.length).length} with proven hidden genes`)),
+    h('div', { class: 'dex-list' }, ...all.map(entry), ...placeholders),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Abilities & field notes
+// ---------------------------------------------------------------------------
+
+function abilitiesTab(ctx: Ctx): HTMLElement {
+  const s = ctx.state;
+  const found = ABILITIES.filter((a) => s.farm.discoveredAbilities[a.id]);
+  const loreIds = Object.keys(LORE);
+  const knownLore = loreIds.filter((id) => s.farm.lore[id]);
+  return h(
+    'div',
+    null,
+    h('div', { class: 'small', style: { display: 'flex', justifyContent: 'space-between' } }, h('b', null, `${found.length} of ${ABILITIES.length} abilities seen in your flock`), h('span', { class: 'muted' }, `${Math.round((found.length / ABILITIES.length) * 100)}%`)),
+    h('div', { class: 'progress' }, h('div', { style: { width: `${(found.length / ABILITIES.length) * 100}%` } })),
+    h(
+      'div',
+      { class: 'ability-grid' },
+      ABILITIES.map((a) => {
+        const d = s.farm.discoveredAbilities[a.id];
+        const who = d ? chickenById(s, d.chickenId) : null;
+        if (!d) return h('button', { class: 'ability-card locked', type: 'button', onclick: () => showAbilityInfo({ ...a, name: 'Unknown ability', does: 'Nobody in your flock can do this yet. Breed towards it, or adopt someone who can.', breeding: '' }, false) }, h('div', { class: 'e' }, '?'), h('div', { class: 'n' }, '· · ·'), h('div', { class: 'd' }, a.flaw ? 'A flaw' : 'Undiscovered'));
+        return h('button', { class: `ability-card ${a.flaw ? 'flaw' : ''}`, type: 'button', onclick: () => showAbilityInfo(a) }, h('div', { class: 'e' }, a.emoji), h('div', { class: 'n' }, a.name), h('div', { class: 'd' }, a.does), who ? h('div', { class: 'w' }, `first seen: ${who.name}`) : null);
+      }),
+    ),
+    h('div', { class: 'section-h' }, 'Field notes', h('span', null, `${knownLore.length}/${loreIds.length}`)),
+    h('p', { class: 'small muted' }, 'Things the flock has learned the hard way. They are true of every chicken.'),
+    ...loreIds.map((id) => {
+      const l = LORE[id]!;
+      const known = !!s.farm.lore[id];
+      return h('div', { class: `milestone ${known ? 'done' : 'todo'}` }, h('div', { class: 'e' }, known ? '📝' : '🔒'), h('div', null, h('div', { class: 't' }, known ? l.title : '· · ·'), h('div', { class: 'd' }, known ? l.text : 'Find out by trying something that does not work.')));
+    }),
+  );
+}
+
+export { ABILITY_BY_ID };
 
 function breedsTab(ctx: Ctx): HTMLElement {
   const s = ctx.state;

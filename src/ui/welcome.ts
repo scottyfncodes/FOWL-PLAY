@@ -22,12 +22,12 @@ export function renderWelcome(ctx: Ctx): HTMLElement {
     'div',
     { class: 'welcome' },
     h('h1', null, 'Fowl Play'),
-    h('p', { class: 'tag-line' }, 'A weird little chicken-breeding discovery game.'),
+    h('p', { class: 'tag-line' }, 'Every problem has a chicken. Breed it. Become it.'),
     chickenArt(view, 'hero-art'),
     h('p', { class: 'meet' }, `This is ${starter.name}.`),
     h('p', { class: 'lede' }, `${/^[AEIOU]/.test(breed?.name ?? '') ? 'An' : 'A'} ${breed?.name ?? 'chicken'}. ${breed?.description ?? ''}`),
     h('div', { class: 'chips' }, notableTraits(view, 4).map((t) => traitChip(t))),
-    h('p', { class: 'lede' }, `${starter.name} needs a friend. Ideally a very different one.`),
+    h('p', { class: 'lede' }, `The farm has problems only a chicken can solve. ${starter.name} will need help: a second chicken, ideally a very different one, and eventually the chicks you breed from them.`),
     h('button', { class: 'btn primary big', onclick: () => { sfx.select(); root.replaceChildren(page2); } }, 'Pick a second chicken'),
   );
 
@@ -53,7 +53,7 @@ export function renderWelcome(ctx: Ctx): HTMLElement {
         );
       }),
     ),
-    h('p', { class: 'small muted' }, 'Tip: the more different the parents, the stranger the chicks.'),
+    h('p', { class: 'small muted' }, 'Tip: what a chicken can do out on the farm comes from its body. Small ones fit through things; big ones shove things. Their chicks inherit both, and sometimes things neither parent showed.'),
   );
 
   const choose = (offerId: string) => {
@@ -63,7 +63,7 @@ export function renderWelcome(ctx: Ctx): HTMLElement {
     ctx.ui.parentA = starter.id;
     ctx.ui.parentB = second?.id ?? null;
     root.remove();
-    ctx.navigate('breed');
+    ctx.navigate('farm');
     if (report) ctx.announce(report, second ?? null);
   };
 

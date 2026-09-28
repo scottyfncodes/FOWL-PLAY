@@ -36,7 +36,7 @@ export function openSettings(ctx: Ctx) {
       h('div', { class: 'section-h' }, 'Danger zone'),
       h('button', { class: 'btn sm', onclick: () => confirmModal('Start over?', 'This deletes every chicken, discovery and ribbon in this browser. There is no undo.', 'Delete everything', () => { ctx.store.reset(); ctx.ui.parentA = null; ctx.ui.parentB = null; close(); ctx.navigate('coop'); }, true) }, 'Reset game'),
       h('div', { class: 'section-h' }, 'About'),
-      h('p', { class: 'small muted' }, 'Fowl Play uses a simplified, game-friendly genetics model. Locus and allele names are borrowed from real poultry genetics for flavour, but the rules here are a toy: please do not use them to plan an actual breeding programme. Breed notes are short summaries and may simplify.'),
+      h('p', { class: 'small muted' }, 'Fowl Play uses a simplified, game-friendly genetics model. What a chicken can do on the farm follows from that model, and only from it. Locus and allele names are borrowed from real poultry genetics for flavour, but the rules here are a toy: please do not use them to plan an actual breeding programme. Breed notes are short summaries and may simplify.'),
     );
   });
 }

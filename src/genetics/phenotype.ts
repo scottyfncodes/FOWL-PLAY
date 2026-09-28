@@ -59,6 +59,25 @@ export interface Phenotype {
   growth: Growth;
   coldHardy: boolean;
   heatTolerant: boolean;
+  // ---- ability-facing features ----
+  longLegs: boolean;
+  bigWings: boolean;
+  webbed: boolean;
+  /** 0 ordinary, 1 firm, 2 strong. */
+  beakStrength: number;
+  /** Copies of the climbing-grip gene (0..2). */
+  gripGene: number;
+  digger: boolean;
+  /** Copies of the loud-crow gene (0..2). */
+  crowGene: number;
+  /** Copies of the brawn gene (0..2). */
+  brawn: number;
+  /** Copies of the springy-legs gene (0..2). */
+  spring: number;
+  /** Net pace from the speed locus: -2..2. */
+  pace: number;
+  nerve: 'aggressive' | 'brave' | 'steady' | 'skittish';
+  habit: 'noisy' | 'greedy' | 'plain' | 'sneaky';
 }
 
 const SIZE_CLASSES: SizeClass[] = ['bantam', 'small', 'small', 'medium', 'large', 'giant', 'colossal'];
@@ -288,6 +307,25 @@ export function computePhenotype(g: Genotype, seed: number | string): Phenotype 
   const personality = [express(g.temper, temperRank, vary), express(g.social, socialRank, vary2)];
   const flair = express(g.flair, flairRank, (vary + vary2) % 1);
   if (flair !== 'none') personality.push(flair);
+  // Nerve and habit: skittish and sneaky are (mostly) recessive.
+  const nerveRank: Record<string, number> = { aggressive: 3, brave: 2, steady: 1, skittish: 0 };
+  const habitRank: Record<string, number> = { noisy: 3, greedy: 2, plain: 1, sneaky: 0 };
+  const nerve = express(g.nerve, nerveRank, (vary * 7) % 1) as Phenotype['nerve'];
+  const habit = express(g.habit, habitRank, (vary2 * 7) % 1) as Phenotype['habit'];
+  if (nerve !== 'steady') personality.push(nerve);
+  if (habit !== 'plain') personality.push(habit);
+
+  // ---------- ability-facing features ----------
+  const longLegs = copies(g, 'legLen', 'lg') === 2;
+  const bigWings = has(g, 'wing', 'Wg');
+  const webbed = copies(g, 'web', 'wb') === 2;
+  const beakStrength = copies(g, 'beak', 'Bk');
+  const gripGene = copies(g, 'grip', 'gr');
+  const digger = copies(g, 'dig', 'dg') === 2;
+  const crowGene = copies(g, 'crow', 'Cw');
+  const brawn = copies(g, 'brawn', 'Bw');
+  const spring = copies(g, 'spring', 'Jp');
+  const pace = copies(g, 'speed', 'qk') - copies(g, 'speed', 'sl');
 
   const growthCopies = copies(g, 'growth', 'fast');
   const growth: Growth = growthCopies === 2 ? 'fast' : growthCopies === 1 ? 'steady' : 'slow';
@@ -330,5 +368,17 @@ export function computePhenotype(g: Genotype, seed: number | string): Phenotype 
     growth,
     coldHardy,
     heatTolerant,
+    longLegs,
+    bigWings,
+    webbed,
+    beakStrength,
+    gripGene,
+    digger,
+    crowGene,
+    brawn,
+    spring,
+    pace,
+    nerve,
+    habit,
   };
 }
