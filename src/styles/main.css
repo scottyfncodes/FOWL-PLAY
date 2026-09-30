@@ -274,6 +274,14 @@ main.screen {
 .detail-hero .art { aspect-ratio: 1; width: 150px; background: radial-gradient(circle at 50% 70%, rgba(255, 255, 255, 0.8), transparent 60%); }
 .detail-hero .name-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .detail-hero .name-row h3 { font-size: 24px; }
+.name-editor { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; min-width: 0; }
+.name-editor .name { overflow-wrap: anywhere; }
+.name-editor .name-edit { padding: 4px 8px; }
+.name-form { display: flex; gap: 6px; align-items: center; width: 100%; margin: 4px 0; }
+.name-form input.text { flex: 1; min-width: 0; }
+.name-form .btn { flex: 0 0 auto; min-height: 44px; }
+.welcome .meet { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
+.welcome .meet .name-editor h3 { font-size: 22px; }
 .detail-hero .facts { font-size: 13px; color: var(--ink-2); display: flex; flex-direction: column; gap: 3px; }
 .detail-egg { display: flex; align-items: center; gap: 10px; }
 .detail-egg .egg { width: 28px; height: 34px; }

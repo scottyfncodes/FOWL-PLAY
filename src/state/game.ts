@@ -299,6 +299,11 @@ export function renameChicken(s: GameState, id: string, name: string): boolean {
   return true;
 }
 
+/** A fresh generated name that no other chicken (or egg) is using. */
+export function suggestName(s: GameState): string {
+  return generateName(createRng(freshSeed()), takenNames(s));
+}
+
 export function toggleFavorite(s: GameState, id: string) {
   const c = chickenById(s, id);
   if (c) c.favorite = !c.favorite;

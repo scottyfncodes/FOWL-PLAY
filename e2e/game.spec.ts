@@ -76,6 +76,36 @@ test('first play: welcome, breed, hatch, coop, persistence', async ({ page }) =>
   expect(errors).toEqual([]);
 });
 
+test('naming: rename the starter on the welcome screen and a chick as it hatches', async ({ page }) => {
+  await page.goto('./');
+  await page.click('.welcome .name-edit');
+  await page.fill('.welcome .name-form input', 'Henrietta');
+  await page.click('.welcome .name-form button[type="submit"]');
+  await expect(page.locator('.welcome .name-editor h3')).toHaveText('Henrietta');
+  await page.click('.welcome .btn.primary.big');
+  await page.click('.welcome .pick >> nth=0');
+  await expect(page.locator('.problem-card')).toBeVisible();
+
+  await page.click('.nav button:has-text("Breed")');
+  await page.click('.breed-cta .btn.primary');
+  await hatchFirstEgg(page);
+  // Naming is optional: the chick arrives with a name, and the dice suggest others.
+  const generated = await page.locator('.reveal .name-editor h2').textContent();
+  expect(generated?.length).toBeGreaterThan(0);
+  await page.click('.reveal .name-edit');
+  await page.click('.reveal .name-form button[aria-label="Suggest a name"]');
+  await expect(page.locator('.reveal .name-form input')).not.toHaveValue('');
+  await page.fill('.reveal .name-form input', 'Little Nugget');
+  await page.press('.reveal .name-form input', 'Enter');
+  await expect(page.locator('.reveal .name-editor h2')).toHaveText('Little Nugget');
+
+  await page.reload();
+  const names = await page.evaluate(() => (window.__fowl.store.state.chickens as { name: string }[]).map((c) => c.name));
+  expect(names).toContain('Henrietta');
+  expect(names).toContain('Little Nugget');
+  expect(errors).toEqual([]);
+});
+
 test('the farm: head out, play as a chicken, solve breakfast, persist the mission', async ({ page, isMobile }) => {
   await completeWelcome(page);
   await page.click('button:has-text("Head out")');
