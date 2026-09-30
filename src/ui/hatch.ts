@@ -14,6 +14,7 @@ import { CURRENCY_ICON } from '../data/economy';
 import type { Egg } from '../state/types';
 import { ABILITY_BY_ID, CARRIER_GENES, abilitiesOf } from '../genetics/abilities';
 import { abilityBadgeRow, showAbilityInfo } from './abilityBadges';
+import { nameEditor } from './nameEditor';
 
 /**
  * The hatch sequence: tap the egg three times (or wait), it cracks, the chick
@@ -173,7 +174,7 @@ export function revealCard(ctx: Ctx, chicken: Chicken, report: DiscoveryReport, 
     'div',
     { class: 'reveal' },
     h('div', { class: 'kicker' }, opts.kicker ?? 'New chicken'),
-    h('h2', null, chicken.name),
+    nameEditor(ctx, chicken.id, { tag: 'h2', prompt: 'Name it' }),
     h('div', { class: 'sub' }, `${ancestryLabel(chicken)} · Generation ${chicken.generation} · `, h('span', { class: `rarity-text ${view.rarity.tier}` }, RARITY_LABEL[view.rarity.tier])),
     h('div', { class: 'sub personality' }, view.phenotype.personality.map((x) => x[0]!.toUpperCase() + x.slice(1)).join(' · ')),
     abilityBadgeRow(abilitiesOf(view.phenotype), { big: true, onClick: (def) => showAbilityInfo(def) }),

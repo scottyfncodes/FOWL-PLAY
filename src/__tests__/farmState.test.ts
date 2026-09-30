@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { startNewGame, breed, hatch, registerChicken, chickenById } from '../state/game';
+import { startNewGame, breed, hatch, registerChicken, chickenById, renameChicken, suggestName } from '../state/game';
 import { applyFarmEvent, currentMission, emptyOutingReport, finishOuting, foundEgg, startOuting, missionSolved } from '../state/farm';
 import { decodeSave, encodeSave, migrate, sanitizeState } from '../save/storage';
 import { freshState } from '../state/game';
@@ -197,5 +197,23 @@ describe('hidden genes proven by breeding', () => {
     const g = genotypeFromSpec({ legLen: 'lg/lg', web: 'wb/wb', spring: 'Jp/Jp' });
     expect(g.legLen).toEqual(['lg', 'lg']);
     expect(g.nerve).toEqual(['steady', 'steady']);
+  });
+});
+
+describe('naming', () => {
+  it('renames a chicken, trimming and capping the name, and ignores blanks', () => {
+    const s = game();
+    const c = s.chickens[0]!;
+    expect(renameChicken(s, c.id, '  Henrietta  ')).toBe(true);
+    expect(c.name).toBe('Henrietta');
+    expect(renameChicken(s, c.id, '   ')).toBe(false);
+    expect(c.name).toBe('Henrietta');
+    renameChicken(s, c.id, 'x'.repeat(50));
+    expect(c.name.length).toBe(32);
+  });
+  it('suggests names no chicken is using', () => {
+    const s = game();
+    const taken = new Set(s.chickens.map((c) => c.name));
+    for (let i = 0; i < 20; i++) expect(taken.has(suggestName(s))).toBe(false);
   });
 });

@@ -4,7 +4,7 @@ import { ancestryLabel, ancestryList, viewOf, type Chicken } from '../chickens/c
 import { TRAIT_BY_ID, type TraitCategory } from '../data/traits';
 import { RARITY_LABEL } from '../genetics/traits';
 import type { Ctx } from './ctx';
-import { bringBack, chickenById, renameChicken, sendToMeadow, toggleFavorite, upgradeLevel } from '../state/game';
+import { bringBack, chickenById, sendToMeadow, toggleFavorite, upgradeLevel } from '../state/game';
 import { ancestryTree } from './ancestryTree';
 import { LOCUS_BY_ID } from '../genetics/loci';
 import { sfx } from '../audio/sfx';
@@ -12,6 +12,7 @@ import { SHOW_CATEGORIES } from '../data/shows';
 import { abilitiesOfChicken } from '../state/farm';
 import { abilityBadgeRow, carrierChips, showAbilityInfo } from './abilityBadges';
 import { MISSIONS } from '../farm/missions';
+import { nameEditor } from './nameEditor';
 
 const CATEGORY_ORDER: TraitCategory[] = ['combo', 'colour', 'pattern', 'feathers', 'head', 'body', 'legs', 'egg', 'utility'];
 const CATEGORY_LABEL: Record<TraitCategory, string> = {
@@ -70,31 +71,9 @@ function detailBody(ctx: Ctx, chicken: Chicken, close: () => void): HTMLElement 
   const nameRow = h(
     'div',
     { class: 'name-row' },
-    h('h3', null, chicken.name),
-    h('button', { class: 'btn sm ghost', 'aria-label': 'Rename', onclick: () => rename() }, '✏️'),
+    nameEditor(ctx, chicken.id, { onRenamed: () => rerender() }),
     h('button', { class: 'btn sm ghost', 'aria-label': 'Favourite', onclick: () => { ctx.store.commit((s) => toggleFavorite(s, chicken.id)); sfx.tap(); rerender(); } }, chicken.favorite ? '⭐' : '☆'),
   );
-
-  const rename = () => {
-    const input = h('input', { class: 'text', value: chicken.name, maxlength: '32', 'aria-label': 'New name' }) as HTMLInputElement;
-    openModal('Rename', (closeRename) =>
-      h(
-        'form',
-        {
-          onsubmit: (e: Event) => {
-            e.preventDefault();
-            if (ctx.store.commit((s) => renameChicken(s, chicken.id, input.value))) {
-              closeRename();
-              rerender();
-            }
-          },
-        },
-        input,
-        h('div', { class: 'btn-row', style: { marginTop: '10px' } }, h('button', { class: 'btn', type: 'button', onclick: closeRename }, 'Cancel'), h('button', { class: 'btn primary', type: 'submit' }, 'Save')),
-      ),
-    );
-    setTimeout(() => input.focus(), 50);
-  };
 
   const parents = chicken.parents ? chicken.parents.map((pid) => chickenById(state, pid)) : [];
   const parentLine = chicken.parents
