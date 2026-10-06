@@ -1,6 +1,9 @@
 import type { Abilities } from '../genetics/abilities';
 import { GRAVITY, GROUND_Y, NO_INPUT, type Board, type Crate, type Crows, type Entity, type Fox, type Input, type LevelDef, type Rect, type WorldEvent } from './types';
 
+/** How long an early jump press is remembered before landing (seconds). */
+const JUMP_BUFFER = 0.12;
+
 /**
  * The farm simulation. Pure: no DOM, fixed timestep, deterministic for a
  * given level, chicken and input sequence. The renderer reads from it; the
@@ -46,6 +49,8 @@ export interface ChickenBody {
   facing: 1 | -1;
   onGround: boolean;
   coyote: number;
+  /** A jump pressed just before landing is kept this long, so it still fires. */
+  jumpBuffer: number;
   flaps: number;
   gliding: boolean;
   swimming: boolean;
@@ -148,6 +153,7 @@ export class World {
       facing: 1,
       onGround: false,
       coyote: 0,
+      jumpBuffer: 0,
       flaps: 0,
       gliding: false,
       swimming: false,
@@ -284,6 +290,7 @@ export class World {
     const jumpPressed = input.jumpPressed || (input.jump && !this.lastInput.jump);
     const actionPressed = input.action;
     this.lastInput = input;
+    c.jumpBuffer = jumpPressed ? JUMP_BUFFER : Math.max(0, c.jumpBuffer - dt);
 
     // ---- busy states -----------------------------------------------------
     if (c.busy > 0) {
@@ -386,6 +393,7 @@ export class World {
       c.flaps = a.glide ? 1 : 0;
       if (jumpPressed && dir !== 0) {
         c.climbing = false;
+        c.jumpBuffer = 0;
         c.vy = -Math.sqrt(2 * GRAVITY * jumpHeightFor(a) * 0.7);
         this.emit({ type: 'sfx', name: 'jump' });
       }
@@ -394,20 +402,23 @@ export class World {
       c.vy += (surface - c.y) * 12 * dt * 10;
       c.vy *= 0.85;
       if (jumpPressed) {
+        c.jumpBuffer = 0;
         c.vy = -Math.sqrt(2 * GRAVITY * jumpHeightFor(a) * 0.8);
         this.emit({ type: 'sfx', name: 'splash' });
       }
     } else {
-      if (jumpPressed) {
-        if (c.onGround || c.coyote > 0) {
-          c.vy = -Math.sqrt(2 * GRAVITY * jumpHeightFor(a));
-          c.onGround = false;
-          c.coyote = 0;
-          c.flaps = a.glide ? 1 : 0;
-          this.emit({ type: 'sfx', name: 'jump' });
-        } else if (c.flaps > 0) {
+      if (c.jumpBuffer > 0 && (c.onGround || c.coyote > 0)) {
+        c.vy = -Math.sqrt(2 * GRAVITY * jumpHeightFor(a));
+        c.onGround = false;
+        c.coyote = 0;
+        c.jumpBuffer = 0;
+        c.flaps = a.glide ? 1 : 0;
+        this.emit({ type: 'sfx', name: 'jump' });
+      } else if (jumpPressed) {
+        if (c.flaps > 0) {
           c.vy = -Math.sqrt(2 * GRAVITY * jumpHeightFor(a) * 0.55);
           c.flaps -= 1;
+          c.jumpBuffer = 0;
           this.emit({ type: 'sfx', name: 'flap' });
         } else if (!a.glide && !this.glideNoteGiven) {
           this.noteWhyNoGlide();
@@ -1048,6 +1059,14 @@ export class World {
   // -------------------------------------------------------------------------
 
   /** Is there something the action button would peck right now? */
+  /** Which of the stick's vertical directions mean something here: climbing a post, hiding in a bush. */
+  stickHints(): { up: boolean; down: boolean } {
+    const body = this.body;
+    const up = this.abilities.climb && this.entities.some((e) => e.kind === 'climb' && overlaps(body, e));
+    const down = this.chicken.onGround && this.entities.some((e) => e.kind === 'bush' && overlaps(body, e));
+    return { up, down };
+  }
+
   actionHint(): string | null {
     const beak = this.beak();
     for (const e of this.entities) {
