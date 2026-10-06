@@ -55,7 +55,11 @@ export function openFarm(ctx: Ctx, chickenId: string) {
   const banner = h('div', { class: 'farm-banner', hidden: true });
   const flash = h('div', { class: 'farm-flash' });
 
-  const padLeft = h('div', { class: 'pad-left' }, h('div', { class: 'pad-arrow l' }, '◀'), h('div', { class: 'pad-arrow r' }, '▶'));
+  const stickKnob = h('div', { class: 'stick-knob' });
+  const stickUp = h('div', { class: 'stick-dir u' }, h('b', null, '▲'), h('i', null, 'climb'));
+  const stickDown = h('div', { class: 'stick-dir d' }, h('i', null, 'hide'), h('b', null, '▼'));
+  const stickBase = h('div', { class: 'stick-base' }, h('div', { class: 'stick-dir l' }, h('b', null, '◀')), h('div', { class: 'stick-dir r' }, h('b', null, '▶')), stickUp, stickDown, stickKnob);
+  const padLeft = h('div', { class: 'pad-left stick-zone' }, stickBase);
   const jumpBtn = h('div', { class: 'pad-btn jump' }, h('span', null, 'JUMP'));
   const peckBtn = h('div', { class: 'pad-btn peck' }, h('span', null, 'PECK'));
   const controls = h('div', { class: 'farm-controls' }, padLeft, h('div', { class: 'pad-right' }, peckBtn, jumpBtn));
@@ -78,26 +82,36 @@ export function openFarm(ctx: Ctx, chickenId: string) {
   if (dbg) dbg.farm = { world, chicken: world.chicken };
 
   // ---- input -----------------------------------------------------------------
+  // Three sources feed one Input: keyboard, the touch stick and buttons, and a gamepad.
+  // Presses (jump, peck) are queued so a tap shorter than a frame is never lost.
   const keys = new Set<string>();
   let jumpQueued = false;
   let actionQueued = false;
-  let touchLeft = false;
-  let touchRight = false;
-  let touchJump = false;
-  let touchUp = false;
-  let touchDown = false;
+  const touch = { left: false, right: false, up: false, down: false, jump: false };
+  const buzz = (ms: number) => {
+    try {
+      navigator.vibrate?.(ms);
+    } catch {
+      /* not supported */
+    }
+  };
+
+  const KEYMAP: Record<string, string> = { arrowleft: 'left', a: 'left', arrowright: 'right', d: 'right', arrowup: 'up', w: 'up', arrowdown: 'down', s: 'down', ' ': 'jump', z: 'jump', k: 'jump', e: 'action', x: 'action', j: 'action', enter: 'action', escape: 'pause', p: 'pause' };
   const onKey = (e: KeyboardEvent, down: boolean) => {
-    if (e.repeat) return;
-    const k = e.key.toLowerCase();
-    const map: Record<string, string> = { arrowleft: 'left', a: 'left', arrowright: 'right', d: 'right', arrowup: 'up', w: 'up', arrowdown: 'down', s: 'down', ' ': 'jump', z: 'jump', k: 'jump', e: 'action', x: 'action', j: 'action', enter: 'action', escape: 'pause' };
-    const m = map[k];
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const m = KEYMAP[e.key.toLowerCase()];
     if (!m) return;
     e.preventDefault();
+    if (e.repeat) return;
     if (down) {
       if (m === 'pause') {
-        if (!paused) openPause();
+        if (paused) {
+          // Escape / P closes the pause card, but not a mission-complete card that needs a choice.
+          if (overlay.querySelector('.farm-card:not(.complete)')) setOverlay(null);
+        } else openPause();
         return;
       }
+      if (paused) return;
       if (m === 'jump' && !keys.has('jump')) jumpQueued = true;
       if (m === 'action' && !keys.has('action')) actionQueued = true;
       keys.add(m);
@@ -105,69 +119,159 @@ export function openFarm(ctx: Ctx, chickenId: string) {
   };
   const keyDown = (e: KeyboardEvent) => onKey(e, true);
   const keyUp = (e: KeyboardEvent) => onKey(e, false);
-  window.addEventListener('keydown', keyDown);
-  window.addEventListener('keyup', keyUp);
-  window.addEventListener('blur', () => keys.clear());
 
-  // Touch: the left pad is a slider (finger left of centre = left, right = right; slide up to climb, down to hide).
-  const pads = new Map<number, 'pad' | 'jump' | 'peck'>();
-  const updatePad = (e: PointerEvent) => {
-    const r = padLeft.getBoundingClientRect();
-    const rel = (e.clientX - r.left) / r.width;
-    const vrel = (e.clientY - r.top) / r.height;
-    touchLeft = rel < 0.46;
-    touchRight = rel > 0.54;
-    touchUp = vrel < 0.25;
-    touchDown = vrel > 0.85;
-    padLeft.classList.toggle('l-on', touchLeft);
-    padLeft.classList.toggle('r-on', touchRight);
+  // Touch stick. It floats: put a thumb down anywhere in the left zone and the stick
+  // centres under it, so there is no aiming at a small target. Push sideways to walk,
+  // up to climb, down to hide. Diagonals work (walk while climbing).
+  const STICK_R = 46;
+  let stickId: number | null = null;
+  let stickCx = 0;
+  let stickCy = 0;
+  const placeStick = (x: number | null, y: number | null) => {
+    if (x === null || y === null) {
+      stickBase.style.removeProperty('left');
+      stickBase.style.removeProperty('top');
+      stickBase.classList.remove('active');
+    } else {
+      stickBase.style.left = `${x}px`;
+      stickBase.style.top = `${y}px`;
+      stickBase.classList.add('active');
+    }
+  };
+  const updateStick = (e: PointerEvent) => {
+    let dx = e.clientX - stickCx;
+    let dy = e.clientY - stickCy;
+    const d = Math.hypot(dx, dy);
+    if (d > STICK_R) {
+      dx = (dx / d) * STICK_R;
+      dy = (dy / d) * STICK_R;
+    }
+    stickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+    const was = { ...touch };
+    touch.left = dx < -STICK_R * 0.3;
+    touch.right = dx > STICK_R * 0.3;
+    touch.up = dy < -STICK_R * 0.5;
+    touch.down = dy > STICK_R * 0.5;
+    stickBase.classList.toggle('l-on', touch.left);
+    stickBase.classList.toggle('r-on', touch.right);
+    stickBase.classList.toggle('u-on', touch.up);
+    stickBase.classList.toggle('d-on', touch.down);
+    if ((touch.up && !was.up) || (touch.down && !was.down)) buzz(6);
+  };
+  const releaseStick = () => {
+    stickId = null;
+    touch.left = touch.right = touch.up = touch.down = false;
+    stickKnob.style.transform = '';
+    stickBase.classList.remove('l-on', 'r-on', 'u-on', 'd-on');
+    placeStick(null, null);
   };
   padLeft.addEventListener('pointerdown', (e) => {
-    pads.set(e.pointerId, 'pad');
+    if (stickId !== null) return;
+    e.preventDefault();
+    stickId = e.pointerId;
     padLeft.setPointerCapture(e.pointerId);
-    updatePad(e);
+    const z = padLeft.getBoundingClientRect();
+    const m = STICK_R + 12;
+    const x = Math.max(m, Math.min(z.width - m, e.clientX - z.left));
+    const y = Math.max(m, Math.min(z.height - m, e.clientY - z.top));
+    placeStick(x, y);
+    stickCx = z.left + x;
+    stickCy = z.top + y;
+    updateStick(e);
   });
   padLeft.addEventListener('pointermove', (e) => {
-    if (pads.get(e.pointerId) === 'pad') updatePad(e);
+    if (e.pointerId === stickId) updateStick(e);
   });
-  const padEnd = (e: PointerEvent) => {
-    if (pads.get(e.pointerId) !== 'pad') return;
-    pads.delete(e.pointerId);
-    touchLeft = touchRight = touchUp = touchDown = false;
-    padLeft.classList.remove('l-on', 'r-on');
+  const stickEnd = (e: PointerEvent) => {
+    if (e.pointerId === stickId) releaseStick();
   };
-  padLeft.addEventListener('pointerup', padEnd);
-  padLeft.addEventListener('pointercancel', padEnd);
-  jumpBtn.addEventListener('pointerdown', (e) => {
-    pads.set(e.pointerId, 'jump');
-    jumpBtn.setPointerCapture(e.pointerId);
-    touchJump = true;
-    jumpQueued = true;
-    jumpBtn.classList.add('on');
-  });
-  const jumpEnd = (e: PointerEvent) => {
-    if (pads.get(e.pointerId) !== 'jump') return;
-    pads.delete(e.pointerId);
-    touchJump = false;
-    jumpBtn.classList.remove('on');
+  padLeft.addEventListener('pointerup', stickEnd);
+  padLeft.addEventListener('pointercancel', stickEnd);
+  padLeft.addEventListener('lostpointercapture', stickEnd);
+
+  // Buttons: each tracks its own finger, so holding jump while tapping peck works.
+  const holdButton = (el: HTMLElement, onDown: () => void, onUp: () => void) => {
+    let id: number | null = null;
+    el.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      if (id !== null) return;
+      id = e.pointerId;
+      el.setPointerCapture(e.pointerId);
+      el.classList.add('on');
+      buzz(10);
+      onDown();
+    });
+    const end = (e: PointerEvent) => {
+      if (e.pointerId !== id) return;
+      id = null;
+      el.classList.remove('on');
+      onUp();
+    };
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+    el.addEventListener('lostpointercapture', end);
   };
-  jumpBtn.addEventListener('pointerup', jumpEnd);
-  jumpBtn.addEventListener('pointercancel', jumpEnd);
-  peckBtn.addEventListener('pointerdown', (e) => {
-    pads.set(e.pointerId, 'peck');
-    actionQueued = true;
-    peckBtn.classList.add('on');
-    setTimeout(() => peckBtn.classList.remove('on'), 120);
-  });
+  holdButton(jumpBtn, () => { touch.jump = true; jumpQueued = true; }, () => { touch.jump = false; });
+  holdButton(peckBtn, () => { actionQueued = true; }, () => {});
   for (const el of [padLeft, jumpBtn, peckBtn]) el.addEventListener('contextmenu', (e) => e.preventDefault());
 
+  // Gamepad (standard mapping): left stick or d-pad to move, A to jump, X or B to peck, Start to pause.
+  const pad = { jump: false, action: false, start: false };
+  const readGamepad = () => {
+    const out = { left: false, right: false, up: false, down: false, jump: false };
+    const gp = navigator.getGamepads ? Array.from(navigator.getGamepads()).find((g) => g && g.connected) : null;
+    if (!gp) return out;
+    const btn = (i: number) => !!gp.buttons[i]?.pressed;
+    const ax = gp.axes[0] ?? 0;
+    const ay = gp.axes[1] ?? 0;
+    out.left = ax < -0.35 || btn(14);
+    out.right = ax > 0.35 || btn(15);
+    out.up = ay < -0.55 || btn(12);
+    out.down = ay > 0.55 || btn(13);
+    out.jump = btn(0);
+    const action = btn(1) || btn(2);
+    const start = btn(9);
+    if (out.jump && !pad.jump) jumpQueued = true;
+    if (action && !pad.action) actionQueued = true;
+    if (start && !pad.start) {
+      if (paused) {
+        if (overlay.querySelector('.farm-card:not(.complete)')) setOverlay(null);
+      } else openPause();
+    }
+    pad.jump = out.jump;
+    pad.action = action;
+    pad.start = start;
+    return out;
+  };
+
+  const releaseAll = () => {
+    keys.clear();
+    releaseStick();
+    touch.jump = false;
+    jumpBtn.classList.remove('on');
+    peckBtn.classList.remove('on');
+  };
+  const onBlur = () => releaseAll();
+  // Backgrounding the app (home button, notification, lock) pauses rather than leaving the chicken running.
+  const onVisibility = () => {
+    if (document.hidden) {
+      releaseAll();
+      if (!paused) openPause();
+    }
+  };
+  window.addEventListener('keydown', keyDown);
+  window.addEventListener('keyup', keyUp);
+  window.addEventListener('blur', onBlur);
+  document.addEventListener('visibilitychange', onVisibility);
+
   const readInput = (): Input => {
+    const gp = readGamepad();
     const input: Input = {
-      left: keys.has('left') || touchLeft,
-      right: keys.has('right') || touchRight,
-      up: keys.has('up') || touchUp,
-      down: keys.has('down') || touchDown,
-      jump: keys.has('jump') || touchJump,
+      left: keys.has('left') || touch.left || gp.left,
+      right: keys.has('right') || touch.right || gp.right,
+      up: keys.has('up') || touch.up || gp.up,
+      down: keys.has('down') || touch.down || gp.down,
+      jump: keys.has('jump') || touch.jump || gp.jump,
       jumpPressed: jumpQueued,
       action: actionQueued,
     };
@@ -365,6 +469,9 @@ export function openFarm(ctx: Ctx, chickenId: string) {
         hint.textContent = ah ?? '';
         peckBtn.classList.toggle('lit', !!ah);
       }
+      const sh = world.stickHints();
+      stickUp.classList.toggle('avail', sh.up);
+      stickDown.classList.toggle('avail', sh.down);
     }
     // Presentation
     const c = world.chicken;
@@ -428,7 +535,7 @@ export function openFarm(ctx: Ctx, chickenId: string) {
     overlay.replaceChildren(...(content ? [content] : []));
     overlay.classList.toggle('show', !!content);
     paused = !!content;
-    keys.clear();
+    releaseAll();
     if (!content) last = performance.now();
   };
 
@@ -442,7 +549,7 @@ export function openFarm(ctx: Ctx, chickenId: string) {
         h('h2', null, chicken.name),
         h('p', { class: 'small muted' }, m ? `Current problem: ${m.name}` : 'Every problem on the farm is solved.'),
         h('div', { class: 'farm-card-actions' }, h('button', { class: 'btn primary big', onclick: () => setOverlay(null) }, '▶ Keep going'), h('button', { class: 'btn', onclick: () => openBoard() }, '📋 The problem'), h('button', { class: 'btn', onclick: () => close('switch') }, '🐔 Switch chicken'), h('button', { class: 'btn ghost', onclick: () => close('coop') }, '🏠 Back to the coop')),
-        h('p', { class: 'small muted controls-help' }, 'Move: ← → or A D · Jump: space (hold to flap or glide) · Peck: E or X · Climb: ↑ against a post · Hide: ↓ in a bush'),
+        h('p', { class: 'small muted controls-help' }, controlsHelp()),
       ),
     );
   };
@@ -496,6 +603,8 @@ export function openFarm(ctx: Ctx, chickenId: string) {
     cancelAnimationFrame(raf);
     window.removeEventListener('keydown', keyDown);
     window.removeEventListener('keyup', keyUp);
+    window.removeEventListener('blur', onBlur);
+    document.removeEventListener('visibilitychange', onVisibility);
     window.removeEventListener('resize', resize);
     ctx.store.commit((s) => finishOuting(s, world));
     root.remove();
@@ -527,6 +636,13 @@ function nearestMission(x: number, s: { farm: { missions: Record<string, unknown
 }
 
 const MISSION_X_LOOKUP: Record<string, number> = { breakfast: 330, gardenGate: 800, crows: 1260, pond: 1740, barnDoor: 2110, grainChute: 2430, foxField: 3150, doorbell: 4290 };
+
+function controlsHelp(): string {
+  const touchFirst = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+  return touchFirst
+    ? 'Thumb anywhere on the left to walk: push up to climb a post, down to hide in a bush. Hold JUMP to flap or glide. PECK lights up when there is something to peck.'
+    : 'Move: ← → or A D · Jump: space (hold to flap or glide) · Peck: E or X · Climb: ↑ against a post · Hide: ↓ in a bush · Pause: Esc or P · Gamepads work too.';
+}
 
 function farmSfx(name: Parameters<typeof sfx.farm>[0]) {
   sfx.farm(name);

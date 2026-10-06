@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { FARM_LEVEL } from '../farm/level';
 import { World, jumpHeightFor } from '../farm/sim';
-import { NO_INPUT, type WorldEvent } from '../farm/types';
+import { GROUND_Y, NO_INPUT, type WorldEvent } from '../farm/types';
 import { DT, LOOK, ab, harness, type Harness } from './farmHarness';
 import { MISSIONS, MISSION_BY_ID } from '../farm/missions';
 import type { Abilities } from '../genetics/abilities';
@@ -407,5 +407,50 @@ describe('world bookkeeping', () => {
       const can = MISSION_BY_ID.gardenGate!.solutions.some((s) => s.needs(a));
       expect(can, `${id} should need help`).toBe(false);
     }
+  });
+});
+
+describe('controls feel', () => {
+  /** Hop straight up on open ground and fall back down to a few frames above the grass. */
+  const fallingNearGround = (framesLeft: number) => {
+    const h = harness(ab());
+    h.wait(1);
+    h.step({ jump: true, jumpPressed: true });
+    for (let t = 0; t < 0.3; t += DT) h.step({ jump: true });
+    for (let n = 0; n < 600; n++) {
+      const c = h.world.chicken;
+      if (c.vy > 0 && GROUND_Y - c.y < c.vy * DT * framesLeft) break;
+      h.step();
+    }
+    expect(h.world.chicken.onGround).toBe(false);
+    return h;
+  };
+  const jumpsAfter = (h: Harness, from: number) => h.events.slice(from).filter((e) => e.type === 'sfx' && e.name === 'jump').length;
+
+  it('a jump pressed just before landing still fires on touchdown', () => {
+    const h = fallingNearGround(4);
+    const from = h.events.length;
+    h.step({ jump: true, jumpPressed: true });
+    for (let t = 0; t < 0.15; t += DT) h.step({ jump: true });
+    expect(jumpsAfter(h, from)).toBe(1);
+  });
+  it('a press long before landing is forgotten', () => {
+    const h = fallingNearGround(30);
+    const from = h.events.length;
+    h.step({ jump: true, jumpPressed: true });
+    h.wait(1);
+    expect(jumpsAfter(h, from)).toBe(0);
+  });
+  it('the stick knows when up means climb and down means hide', () => {
+    expect(harness(ab()).world.stickHints()).toEqual({ up: false, down: false });
+    const climber = harness(ab({ climb: true }), { flags: CH.garden, spawnX: 760 });
+    climber.wait(0.5);
+    expect(climber.world.stickHints().up).toBe(true);
+    const plain = harness(ab(), { flags: CH.garden, spawnX: 760 });
+    plain.wait(0.5);
+    expect(plain.world.stickHints().up).toBe(false);
+    const hider = harness(ab(), { flags: CH.toField, spawnX: 2978 });
+    hider.wait(0.5);
+    expect(hider.world.stickHints().down).toBe(true);
   });
 });
