@@ -11,10 +11,9 @@ import type { Input, WorldEvent } from './types';
 import { LORE, MISSION_BY_ID, MISSIONS } from './missions';
 import { chickenArt, toast } from '../ui/components';
 import { sfx } from '../audio/sfx';
-import { CURRENCY_ICON } from '../data/economy';
 import { ABILITY_BY_ID } from '../genetics/abilities';
 import { CLUE_TEXT } from './clues';
-import { PAUSE_ICON } from '../ui/marks';
+import { PAUSE_ICON, markCorn } from '../ui/marks';
 
 const STEP = 1 / 60;
 
@@ -48,7 +47,8 @@ export function openFarm(ctx: Ctx, chickenId: string) {
   const canvas = h('canvas', { class: 'farm-canvas' });
   const renderer = new FarmRenderer(canvas);
   const missionChip = h('button', { class: 'farm-chip mission', type: 'button', onclick: () => openBoard() }, '');
-  const cornChip = h('div', { class: 'farm-chip corn' }, `${CURRENCY_ICON} ${ctx.state.corn}`);
+  const cornCount = h('span', null, String(ctx.state.corn));
+  const cornChip = h('div', { class: 'farm-chip corn', title: 'Corn' }, markCorn(), cornCount);
   const pauseBtn = h('button', { class: 'farm-chip icon', type: 'button', 'aria-label': 'Pause', onclick: () => openPause(), html: PAUSE_ICON });
   const nameChip = h('div', { class: 'farm-chip name' }, chicken.name);
   const bubble = h('div', { class: 'thought', hidden: true });
@@ -421,7 +421,7 @@ export function openFarm(ctx: Ctx, chickenId: string) {
       ctx.store.commit((s) => {
         for (const ev of stateEvents) applyFarmEvent(s, ev, chicken, report);
       });
-      cornChip.textContent = `${CURRENCY_ICON} ${ctx.state.corn}`;
+      cornCount.textContent = String(ctx.state.corn);
       if (ctx.state.corn !== before.corn) {
         cornChip.classList.remove('bump');
         void cornChip.offsetWidth;
@@ -590,7 +590,7 @@ export function openFarm(ctx: Ctx, chickenId: string) {
         h('h2', null, def.done),
         chickenArt(view, 'art small'),
         h('p', { class: 'lede' }, `${chicken.name}: ${sol ? sol.label.toLowerCase() : 'found a way'}.`),
-        h('p', { class: 'small' }, `+${def.reward} ${CURRENCY_ICON} corn`),
+        h('p', { class: 'small' }, `+${def.reward} corn`),
         isLast ? h('p', { class: 'small muted' }, 'That was the last problem on the farm, for now. The Woods are being surveyed.') : h('p', { class: 'small muted' }, def.afterword),
         h('div', { class: 'farm-card-actions' }, isLast ? null : h('button', { class: 'btn primary big', onclick: () => setOverlay(null) }, 'Keep exploring'), h('button', { class: isLast ? 'btn primary big' : 'btn', onclick: () => close('coop') }, 'Back to the coop')),
       ),
@@ -616,7 +616,7 @@ export function openFarm(ctx: Ctx, chickenId: string) {
       ctx.chooseOuting();
     } else {
       ctx.navigate('farm');
-      if (report.corn > 0 || report.solved.length > 0) toast(`${chicken.name} is back in the coop. ${report.corn > 0 ? `+${report.corn} ${CURRENCY_ICON}` : ''}`);
+      if (report.corn > 0 || report.solved.length > 0) toast(`${chicken.name} is back in the coop. ${report.corn > 0 ? `+${report.corn} corn` : ''}`);
     }
   };
 }

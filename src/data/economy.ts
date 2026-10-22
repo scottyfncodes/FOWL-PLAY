@@ -1,5 +1,4 @@
 export const CURRENCY = 'Corn';
-export const CURRENCY_ICON = '🌽';
 
 export const STARTING_CORN = 60;
 export const STARTING_COOP_SLOTS = 8;

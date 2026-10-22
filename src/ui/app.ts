@@ -11,7 +11,7 @@ import { openHatchOverlay } from './hatch';
 import { renderWelcome } from './welcome';
 import { openSettings } from './settings';
 import { closeAllModals, toast } from './components';
-import { CURRENCY_ICON } from '../data/economy';
+import { markCorn } from './marks';
 import { TRAIT_BY_ID } from '../data/traits';
 import { BREED_BY_ID } from '../data/breeds';
 import { MILESTONE_BY_ID } from '../data/milestones';
@@ -58,7 +58,7 @@ export class App implements Ctx {
     applyTheme(store.state.theme);
     const hashTab = location.hash.replace('#', '') as Tab;
     if (TABS.some((t) => t.id === hashTab)) this.ui.tab = hashTab;
-    this.cornEl = h('div', { class: 'corn-pill', title: 'Corn' }, CURRENCY_ICON, h('span', null, String(store.state.corn)));
+    this.cornEl = h('div', { class: 'corn-pill', title: 'Corn' }, markCorn(), h('span', null, String(store.state.corn)));
     this.main = h('main', { class: 'screen' });
     this.navEl = h('nav', { class: 'nav', 'aria-label': 'Main' });
     this.root.replaceChildren(
@@ -157,7 +157,7 @@ export class App implements Ctx {
   }
 
   toastCorn(amount: number) {
-    if (amount > 0) toast(`+${amount} ${CURRENCY_ICON} corn`);
+    if (amount > 0) toast(`+${amount} corn`);
   }
 
   announce(report: DiscoveryReport, chicken?: Chicken | null) {
