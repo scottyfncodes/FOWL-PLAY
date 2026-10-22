@@ -13,6 +13,7 @@ import { CURRENCY_ICON } from '../../data/economy';
 import { showTraitInfo } from '../chickenDetail';
 import { SHOW_BY_ID } from '../../data/shows';
 import { ABILITIES, ABILITY_BY_ID, CARRIER_GENES } from '../../genetics/abilities';
+import { markLock, markTick } from '../marks';
 import { abilityBadgeRow, showAbilityInfo } from '../abilityBadges';
 import { chickenArt } from '../components';
 import { viewOf, type Chicken } from '../../chickens/chicken';
@@ -81,7 +82,7 @@ function flockTab(ctx: Ctx): HTMLElement {
       ),
     );
   };
-  const placeholders = [0, 1, 2].map((i) => h('div', { class: 'dex-entry locked' }, h('div', { class: 'no' }, `#${String(s.farm.nextNo + i).padStart(3, '0')}`), h('div', { class: 'art silhouette' }, '🐔'), h('div', { class: 'body' }, h('div', { class: 'name' }, '???'), h('div', { class: 'sub' }, 'Not yet hatched'))));
+  const placeholders = [0, 1, 2].map((i) => h('div', { class: 'dex-entry locked' }, h('div', { class: 'no' }, `#${String(s.farm.nextNo + i).padStart(3, '0')}`), svgBox(breedArt(BREEDS[i % BREEDS.length]!), 'art silhouette'), h('div', { class: 'body' }, h('div', { class: 'name' }, '???'), h('div', { class: 'sub' }, 'Not yet hatched'))));
   return h(
     'div',
     null,
@@ -110,8 +111,8 @@ function abilitiesTab(ctx: Ctx): HTMLElement {
       ABILITIES.map((a) => {
         const d = s.farm.discoveredAbilities[a.id];
         const who = d ? chickenById(s, d.chickenId) : null;
-        if (!d) return h('button', { class: 'ability-card locked', type: 'button', onclick: () => showAbilityInfo({ ...a, name: 'Unknown ability', does: 'Nobody in your flock can do this yet. Breed towards it, or adopt someone who can.', breeding: '' }, false) }, h('div', { class: 'e' }, '?'), h('div', { class: 'n' }, '· · ·'), h('div', { class: 'd' }, a.flaw ? 'A flaw' : 'Undiscovered'));
-        return h('button', { class: `ability-card ${a.flaw ? 'flaw' : ''}`, type: 'button', onclick: () => showAbilityInfo(a) }, h('div', { class: 'e' }, a.emoji), h('div', { class: 'n' }, a.name), h('div', { class: 'd' }, a.does), who ? h('div', { class: 'w' }, `first seen: ${who.name}`) : null);
+        if (!d) return h('button', { class: 'ability-card locked', type: 'button', onclick: () => showAbilityInfo({ ...a, name: 'Unknown ability', does: 'Nobody in your flock can do this yet. Breed towards it, or adopt someone who can.', breeding: '' }, false) }, h('div', { class: 'n' }, '· · ·'), h('div', { class: 'd' }, a.flaw ? 'A flaw' : 'Undiscovered'));
+        return h('button', { class: `ability-card ${a.flaw ? 'flaw' : ''}`, type: 'button', onclick: () => showAbilityInfo(a) }, h('div', { class: 'n' }, a.name), h('div', { class: 'd' }, a.does), who ? h('div', { class: 'w' }, `first seen: ${who.name}`) : null);
       }),
     ),
     h('div', { class: 'section-h' }, 'Field notes', h('span', null, `${knownLore.length}/${loreIds.length}`)),
@@ -119,7 +120,7 @@ function abilitiesTab(ctx: Ctx): HTMLElement {
     ...loreIds.map((id) => {
       const l = LORE[id]!;
       const known = !!s.farm.lore[id];
-      return h('div', { class: `milestone ${known ? 'done' : 'todo'}` }, h('div', { class: 'e' }, known ? '📝' : '🔒'), h('div', null, h('div', { class: 't' }, known ? l.title : '· · ·'), h('div', { class: 'd' }, known ? l.text : 'Find out by trying something that does not work.')));
+      return h('div', { class: `milestone ${known ? 'done' : 'todo'}` }, known ? markTick() : markLock(), h('div', null, h('div', { class: 't' }, known ? l.title : '· · ·'), h('div', { class: 'd' }, known ? l.text : 'Find out by trying something that does not work.')));
     }),
   );
 }
@@ -247,7 +248,7 @@ function milestonesTab(ctx: Ctx): HTMLElement {
     h('div', { class: 'progress' }, h('div', { style: { width: `${(done.length / MILESTONES.length) * 100}%` } })),
     ...MILESTONES.map((m) => {
       const at = s.milestones[m.id];
-      return h('div', { class: `milestone ${at ? 'done' : 'todo'}` }, h('div', { class: 'e' }, at ? m.emoji : '🔒'), h('div', null, h('div', { class: 't' }, m.name), h('div', { class: 'd' }, m.description)), h('div', { class: 'r' }, at ? `✓ ${timeAgo(at)}` : `+${m.reward} ${CURRENCY_ICON}`));
+      return h('div', { class: `milestone ${at ? 'done' : 'todo'}` }, at ? markTick() : markLock(), h('div', null, h('div', { class: 't' }, m.name), h('div', { class: 'd' }, m.description)), h('div', { class: 'r' }, at ? `✓ ${timeAgo(at)}` : `+${m.reward} ${CURRENCY_ICON}`));
     }),
     log.length ? h('div', { class: 'section-h' }, 'Recent discoveries') : null,
     ...log.map((e) => h('div', { class: 'log-item' }, h('span', { class: 'when' }, timeAgo(e.at)), h('span', null, describe(e)), e.corn ? h('span', { class: 'muted', style: { marginLeft: 'auto' } }, `+${e.corn} ${CURRENCY_ICON}`) : null)),

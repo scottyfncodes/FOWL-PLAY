@@ -166,7 +166,7 @@ export function enterShowPicker(ctx: Ctx, chicken: Chicken) {
       null,
       h('p', { class: 'lede' }, `Which category should ${chicken.name} enter?`),
       SHOW_CATEGORIES.map((cat) =>
-        h('button', { class: 'show-cat', onclick: () => { close(); ctx.ui.hatcheryTab = 'show'; ctx.navigate('hatchery'); import('./screens/show').then((m) => m.judge(ctx, cat.id, chicken.id)); } }, h('div', { class: 'e' }, cat.emoji), h('div', null, h('div', { class: 't' }, cat.name), h('div', { class: 'd' }, cat.blurb))),
+        h('button', { class: 'show-cat', onclick: () => { close(); ctx.ui.hatcheryTab = 'show'; ctx.navigate('hatchery'); import('./screens/show').then((m) => m.judge(ctx, cat.id, chicken.id)); } }, h('div', null, h('div', { class: 't' }, cat.name), h('div', { class: 'd' }, cat.blurb))),
       ),
     ),
   );

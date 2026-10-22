@@ -11,7 +11,7 @@ import { chickenById } from '../state/game';
 export function ancestryTree(state: GameState, chicken: Chicken, depth: number, onPick: (c: Chicken) => void): HTMLElement {
   const node = (c: Chicken | null, label: string, me = false) => {
     if (!c) {
-      return h('div', { class: 'tree-node' }, h('div', { class: 'art unknown' }, '🥚'), h('div', { class: 'n' }, label));
+      return h('div', { class: 'tree-node' }, h('div', { class: 'art unknown', 'aria-hidden': 'true' }, '?'), h('div', { class: 'n' }, label));
     }
     const v = viewOf(c);
     return h(

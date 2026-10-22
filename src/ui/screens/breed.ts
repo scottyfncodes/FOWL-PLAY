@@ -50,7 +50,7 @@ export function renderBreed(ctx: Ctx): HTMLElement {
       list.slice(0, max).map((o) => {
         const c = traitChip(o.traitId, { showOdds: discovered.has(o.traitId) ? o.chance : undefined, onClick: discovered.has(o.traitId) ? () => showTraitInfo(o.traitId) : undefined });
         if (!discovered.has(o.traitId)) {
-          c.replaceChildren(h('span', { class: 'e' }, '❓'), 'Unknown', h('span', { class: 'odds' }, `${Math.round(o.chance * 100)}%`));
+          c.replaceChildren('Unknown', h('span', { class: 'odds' }, `${Math.round(o.chance * 100)}%`));
           c.className = 'chip unknown';
         }
         return c;

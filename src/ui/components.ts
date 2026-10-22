@@ -100,7 +100,7 @@ export function traitChip(id: string, opts: { isNew?: boolean; onClick?: () => v
   const def = TRAIT_BY_ID[id];
   if (!def) return h('span', { class: 'chip unknown' }, '?');
   const cls = ['chip', def.rarity !== 'common' ? def.rarity : '', opts.isNew ? 'new' : '', opts.big ? 'big' : '', opts.onClick ? 'btn-chip' : ''].join(' ');
-  const inner: Child[] = [h('span', { class: 'e' }, def.emoji), def.name];
+  const inner: Child[] = [def.name];
   if (opts.showOdds !== undefined) inner.push(h('span', { class: 'odds' }, `${Math.round(opts.showOdds * 100)}%`));
   if (opts.isNew) inner.push(h('span', { class: 'new-tag' }, 'new'));
   if (opts.onClick) return h('button', { class: cls, onclick: opts.onClick, type: 'button' }, ...inner);

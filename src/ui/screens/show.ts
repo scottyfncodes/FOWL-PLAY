@@ -1,14 +1,14 @@
 import { h } from '../dom';
 import { chickenArt, chickenCard, openModal, toast } from '../components';
 import { viewOf } from '../../chickens/chicken';
-import { RIBBON_LABEL, SHOW_BY_ID, SHOW_CATEGORIES, type Ribbon } from '../../data/shows';
+import { RIBBON_LABEL, SHOW_BY_ID, SHOW_CATEGORIES } from '../../data/shows';
 import { chickenById, coopChickens, enterShow } from '../../state/game';
 import type { Ctx } from '../ctx';
 import { sfx } from '../../audio/sfx';
 import { CURRENCY_ICON } from '../../data/economy';
 import { MILESTONE_BY_ID } from '../../data/milestones';
+import { rosette } from '../marks';
 
-const RIBBON_EMOJI: Record<Ribbon, string> = { none: '·', bronze: '🥉', silver: '🥈', gold: '🥇' };
 
 export function renderShow(ctx: Ctx): HTMLElement {
   const s = ctx.state;
@@ -22,9 +22,8 @@ export function renderShow(ctx: Ctx): HTMLElement {
       return h(
         'button',
         { class: 'show-cat', type: 'button', onclick: () => pickEntrant(ctx, cat.id) },
-        h('div', { class: 'e' }, cat.emoji),
         h('div', null, h('div', { class: 't' }, cat.name), h('div', { class: 'd' }, cat.blurb)),
-        h('div', { class: 'best' }, best ? [h('div', { class: 'ribbon' }, RIBBON_EMOJI[best.ribbon]), h('div', null, `${best.chickenName} · ${best.score}`)] : h('div', { class: 'muted' }, 'No entries yet')),
+        h('div', { class: 'best' }, best ? [rosette(best.ribbon), h('div', null, `${best.chickenName} · ${best.score}`)] : h('div', { class: 'muted' }, 'No entries yet')),
       );
     }),
   );
@@ -68,7 +67,7 @@ export function judge(ctx: Ctx, categoryId: string, chickenId: string) {
       h('div', { class: 'label' }, chicken.name),
       h('div', { class: 'score' }, `${result.score}`),
       meter,
-      h('div', null, h('span', { class: 'ribbon' }, RIBBON_EMOJI[result.ribbon]), ' ', h('b', null, RIBBON_LABEL[result.ribbon])),
+      h('div', null, rosette(result.ribbon), ' ', h('b', null, RIBBON_LABEL[result.ribbon])),
       h('p', { class: 'remark' }, `“${result.remark}”`),
       result.corn > 0 ? h('p', { class: 'small', style: { marginTop: '8px', fontWeight: '700' } }, `+${result.corn} ${CURRENCY_ICON} corn`) : h('p', { class: 'small muted', style: { marginTop: '8px' } }, result.improved && result.score > 0 ? 'A new personal best, but no ribbon this time.' : result.score === 0 ? 'The judge wrote nothing down at all.' : 'Not a new best. The judge remembers.'),
       result.milestones.length ? h('p', { class: 'small', style: { marginTop: '6px' } }, `Milestone: ${result.milestones.map((m) => MILESTONE_BY_ID[m]?.name ?? m).join(', ')}`) : null,

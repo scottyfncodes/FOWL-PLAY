@@ -42,14 +42,14 @@ export function renderCoop(ctx: Ctx): HTMLElement {
     upgradeLevel(s, 'bunting') > 0 ? h('div', { class: 'bunting' }) : null,
     h('div', { class: 'screen-title' }, h('h2', null, 'The Coop'), h('span', { class: 'meta' }, `${coopLoad(s)} / ${coopCapacity(s)} roosts`)),
     h('p', { class: 'lede' }, coop.length < 3 ? 'Tap a chicken to see what it can do. Breed two to see what their chicks can do.' : 'Every chicken here is a possible parent and a possible hero. Tap one to inspect it, breed it, or take it out.'),
-    eggsWaiting > 0 ? h('div', { class: 'banner', role: 'status' }, '🥚', h('span', { class: 'grow' }, `${eggsWaiting} egg${eggsWaiting > 1 ? 's' : ''} waiting in the incubator`), h('button', { class: 'btn sm primary', onclick: () => ctx.navigate('breed') }, 'Hatch')) : null,
+    eggsWaiting > 0 ? h('div', { class: 'banner', role: 'status' }, h('span', { class: 'grow' }, `${eggsWaiting} egg${eggsWaiting > 1 ? 's' : ''} waiting in the incubator`), h('button', { class: 'btn sm primary', onclick: () => ctx.navigate('breed') }, 'Hatch')) : null,
     h('div', { class: 'filter-row' }, sortSelect, h('span', { class: 'small muted' }, `${coop.length} in the coop${meadow.length ? `, ${meadow.length} in the meadow` : ''}`)),
     h(
       'div',
       { class: 'grid' },
       sorted.map((c) => chickenCard(c, { onClick: onCard, isNew: c.id === highlight })),
     ),
-    coop.length === 0 ? h('div', { class: 'empty' }, h('div', { class: 'big-e' }, '🐔'), 'The coop is empty. Visit the Hatchery.') : null,
+    coop.length === 0 ? h('div', { class: 'empty' }, 'The coop is empty. Visit the Hatchery.') : null,
     meadow.length > 0
       ? h(
           'div',

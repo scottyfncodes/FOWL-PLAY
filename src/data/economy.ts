@@ -23,26 +23,25 @@ export const HATCHERY_FREE_REFRESH_EVERY = 4;
 export interface UpgradeDef {
   id: string;
   name: string;
-  emoji: string;
   description: string;
   /** Cost for level n (0-based index). Length = max levels. */
   costs: number[];
 }
 
 export const UPGRADES: UpgradeDef[] = [
-  { id: 'coop', name: 'Coop Extension', emoji: '🏠', description: 'Four more roosting slots in the coop.', costs: [60, 110, 170, 240, 320, 420, 540, 700] },
-  { id: 'incubator', name: 'Incubator Tray', emoji: '🔥', description: 'One more egg can wait in the incubator.', costs: [80, 160, 280, 450] },
-  { id: 'fieldNotes', name: 'Field Notes', emoji: '📝', description: 'Reveal inheritance hints for undiscovered traits in the Almanac.', costs: [90] },
-  { id: 'pedigree', name: 'Pedigree Ledger', emoji: '📜', description: 'Show ancestry three generations deep instead of two.', costs: [120] },
-  { id: 'bunting', name: 'Bunting', emoji: '🎏', description: 'Decorative bunting across the coop. Purely for morale.', costs: [40] },
-  { id: 'nameplates', name: 'Brass Nameplates', emoji: '🪧', description: 'Fancy nameplates on every chicken card.', costs: [50] },
+  { id: 'coop', name: 'Coop Extension', description: 'Four more roosting slots in the coop.', costs: [60, 110, 170, 240, 320, 420, 540, 700] },
+  { id: 'incubator', name: 'Incubator Tray', description: 'One more egg can wait in the incubator.', costs: [80, 160, 280, 450] },
+  { id: 'fieldNotes', name: 'Field Notes', description: 'Reveal inheritance hints for undiscovered traits in the Almanac.', costs: [90] },
+  { id: 'pedigree', name: 'Pedigree Ledger', description: 'Show ancestry three generations deep instead of two.', costs: [120] },
+  { id: 'bunting', name: 'Bunting', description: 'Decorative bunting across the coop. Purely for morale.', costs: [40] },
+  { id: 'nameplates', name: 'Brass Nameplates', description: 'Fancy nameplates on every chicken card.', costs: [50] },
 ];
 
 export const UPGRADE_BY_ID: Record<string, UpgradeDef> = Object.fromEntries(UPGRADES.map((u) => [u.id, u]));
 
 export const COOP_THEMES = [
-  { id: 'paper', name: 'Field Notebook', emoji: '📒', cost: 0 },
-  { id: 'meadow', name: 'Meadow Green', emoji: '🌿', cost: 45 },
-  { id: 'dusk', name: 'Dusk Blue', emoji: '🌙', cost: 45 },
-  { id: 'terracotta', name: 'Terracotta', emoji: '🏺', cost: 45 },
+  { id: 'paper', name: 'Field Notebook', cost: 0 },
+  { id: 'meadow', name: 'Meadow Green', cost: 45 },
+  { id: 'dusk', name: 'Dusk Blue', cost: 45 },
+  { id: 'terracotta', name: 'Terracotta', cost: 45 },
 ] as const;
