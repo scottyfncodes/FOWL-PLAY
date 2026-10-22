@@ -85,6 +85,7 @@ p { margin: 0; }
   background: var(--card); font-size: 18px; display: inline-flex; align-items: center; justify-content: center;
 }
 .icon-btn:active { transform: scale(0.94); }
+.icon-btn svg { width: 20px; height: 20px; color: var(--ink-2); }
 
 main.screen {
   flex: 1; padding: 14px 14px calc(var(--nav-h) + var(--safe-b) + 24px);
@@ -105,7 +106,8 @@ main.screen {
   border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
   font-size: 11px; font-weight: 600; color: var(--ink-3); position: relative; letter-spacing: 0.02em;
 }
-.nav button .ico { font-size: 22px; line-height: 1; transition: transform 0.15s; }
+.nav button .ico { line-height: 0; transition: transform 0.15s; }
+.nav button .ico svg { width: 24px; height: 24px; }
 .nav button.active { color: var(--accent); }
 .nav button.active .ico { transform: translateY(-2px) scale(1.1); }
 .nav .badge {
@@ -180,6 +182,7 @@ main.screen {
   white-space: nowrap; max-width: 100%;
 }
 .chip .e { font-size: 13px; }
+.chip .new-tag { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #8a5a10; }
 .chip.rare { border-color: var(--r-rare); color: var(--r-rare); background: color-mix(in srgb, var(--r-rare) 8%, var(--card)); }
 .chip.exotic { border-color: var(--r-exotic); color: var(--r-exotic); background: color-mix(in srgb, var(--r-exotic) 8%, var(--card)); }
 .chip.legendary { border-color: var(--r-legendary); color: #8a5a10; background: color-mix(in srgb, var(--r-legendary) 14%, var(--card)); }
@@ -319,8 +322,10 @@ main.screen {
 @keyframes burst { 0% { transform: scale(1); opacity: 1; } 40% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
 .chick-pop { width: 240px; height: 240px; margin: 0 auto; animation: pop-in 0.7s cubic-bezier(0.2, 1.5, 0.4, 1); }
 @keyframes pop-in { 0% { transform: scale(0.2) translateY(40px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
-.sparkle { position: absolute; pointer-events: none; font-size: 22px; animation: sparkle 0.9s ease-out forwards; }
-@keyframes sparkle { 0% { transform: translate(0, 0) scale(0.4); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) scale(1.2); opacity: 0; } }
+/* eggshell shards thrown out when the egg breaks */
+.shell { position: absolute; pointer-events: none; width: 14px; height: 11px; background: #f6efe0; clip-path: polygon(0 30%, 45% 0, 100% 40%, 70% 100%, 20% 85%); animation: shell 0.9s ease-out forwards; }
+.shell:nth-child(3n) { background: var(--egg-blue); }
+@keyframes shell { 0% { transform: translate(0, 0) rotate(0) scale(0.6); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) rotate(260deg) scale(1); opacity: 0; } }
 .tap-hint { font-size: 13px; opacity: 0.6; margin-top: 8px; }
 
 .reveal {

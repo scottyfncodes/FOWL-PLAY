@@ -79,7 +79,7 @@ export function openHatchOverlay(ctx: Ctx, eggId: string) {
     clearInterval(auto);
     eggEl.classList.add('burst');
     for (let i = 0; i < 14; i++) {
-      const s = h('span', { class: 'sparkle', style: { left: '50%', top: '45%', '--dx': `${(Math.random() - 0.5) * 320}px`, '--dy': `${(Math.random() - 0.7) * 320}px` } as unknown as Record<string, string> }, ['✨', '🌟', '💫', '🐣'][i % 4]!);
+      const s = h('span', { class: 'shell', style: { left: '50%', top: '45%', '--dx': `${(Math.random() - 0.5) * 320}px`, '--dy': `${(Math.random() - 0.7) * 320}px` } as unknown as Record<string, string> }, '');
       stage.appendChild(s);
     }
     setTimeout(() => reveal(egg), 350);
@@ -143,31 +143,31 @@ export function revealCard(ctx: Ctx, chicken: Chicken, report: DiscoveryReport, 
     const def = TRAIT_BY_ID[t];
     if (!def) continue;
     if (def.rarity === 'common') {
-      commonNew.push(`${def.emoji} ${def.name}`);
+      commonNew.push(def.name);
       continue;
     }
     const rare = def.rarity === 'rare' || def.rarity === 'exotic';
-    addDisc(def.rarity === 'legendary' ? 'legendary-d' : rare ? 'rare-d' : '', `✨ New trait discovered · ${RARITY_LABEL[def.rarity]}`, `${def.emoji} ${def.name}`, rare || def.rarity === 'legendary' ? TRAIT_KICKERS[(t.length + chicken.seed) % TRAIT_KICKERS.length]! + ' ' + def.description : def.description);
+    addDisc(def.rarity === 'legendary' ? 'legendary-d' : rare ? 'rare-d' : '', `New trait discovered · ${RARITY_LABEL[def.rarity]}`, def.name, rare || def.rarity === 'legendary' ? TRAIT_KICKERS[(t.length + chicken.seed) % TRAIT_KICKERS.length]! + ' ' + def.description : def.description);
   }
   for (const b of report.newBreeds) {
     const def = BREED_BY_ID[b.id];
     if (!def) continue;
-    addDisc('', b.how === 'resemblance' ? '📖 Almanac: look-alike bred' : '📖 New breed in the Almanac', def.name, b.how === 'resemblance' ? `${chicken.name} looks enough like a ${def.name} that the Almanac counts it.` : def.description);
+    addDisc('', b.how === 'resemblance' ? 'Almanac: look-alike bred' : 'New breed in the Almanac', def.name, b.how === 'resemblance' ? `${chicken.name} looks enough like a ${def.name} that the Almanac counts it.` : def.description);
   }
   for (const m of report.milestones) {
     const def = MILESTONE_BY_ID[m];
-    if (def) addDisc('', '🏅 Milestone', `${def.emoji} ${def.name}`, def.description);
+    if (def) addDisc('', 'Milestone', def.name, def.description);
   }
-  if (report.mutated) addDisc('rare-d', '🧬 Mutation', 'Something changed on its own', `A spontaneous change at: ${chicken.mutations.map((m) => LOCUS_BY_ID[m]?.name.toLowerCase() ?? m).join(', ')}. This was not inherited from either parent.`);
+  if (report.mutated) addDisc('rare-d', 'Mutation', 'Something changed on its own', `A spontaneous change at: ${chicken.mutations.map((m) => LOCUS_BY_ID[m]?.name.toLowerCase() ?? m).join(', ')}. This was not inherited from either parent.`);
   for (const id of report.newAbilities) {
     const def = ABILITY_BY_ID[id];
-    if (def && !def.flaw) addDisc('rare-d', '🌾 New ability in the flock', `${def.emoji} ${def.name}`, def.does);
+    if (def && !def.flaw) addDisc('rare-d', 'New ability in the flock', def.name, def.does);
   }
   const byGene = new Map<string, string[]>();
   for (const pc of report.provenCarriers) byGene.set(pc.abilityId, [...(byGene.get(pc.abilityId) ?? []), pc.parentName]);
   for (const [abilityId, names] of byGene) {
     const gene = CARRIER_GENES.find((g) => g.abilityId === abilityId);
-    addDisc('', '🧬 Hidden gene revealed', `${names.join(' and ')} ${names.length > 1 ? 'carry' : 'carries'} ${gene?.name ?? abilityId}`, `${chicken.name} shows it, so the parents must have been carrying it all along. Write that down: it changes who to breed next.`);
+    addDisc('', 'Hidden gene revealed', `${names.join(' and ')} ${names.length > 1 ? 'carry' : 'carries'} ${gene?.name ?? abilityId}`, `${chicken.name} shows it, so the parents must have been carrying it all along. Write that down: it changes who to breed next.`);
   }
 
   const card = h(
@@ -185,9 +185,9 @@ export function revealCard(ctx: Ctx, chicken: Chicken, report: DiscoveryReport, 
     h(
       'div',
       { class: 'actions' },
-      h('button', { class: 'btn primary big', onclick: () => { sfx.select(); onDone(); ctx.ui.highlightId = chicken.id; ctx.navigate('coop'); } }, opts.doneLabel ?? '🏠 Add to coop'),
-      h('button', { class: 'btn', onclick: () => { sfx.select(); onDone(); ctx.playAs(chicken.id); } }, '🌾 Take it to the farm'),
-      h('button', { class: 'btn', onclick: () => { sfx.select(); onDone(); ctx.breedWith(chicken.id); } }, '🧬 Breed this one next'),
+      h('button', { class: 'btn primary big', onclick: () => { sfx.select(); onDone(); ctx.ui.highlightId = chicken.id; ctx.navigate('coop'); } }, opts.doneLabel ?? 'Add to coop'),
+      h('button', { class: 'btn', onclick: () => { sfx.select(); onDone(); ctx.playAs(chicken.id); } }, 'Take it to the farm'),
+      h('button', { class: 'btn', onclick: () => { sfx.select(); onDone(); ctx.breedWith(chicken.id); } }, 'Breed this one next'),
       h('button', { class: 'btn ghost', onclick: () => { onDone(); ctx.showChicken(chicken.id); } }, 'Inspect'),
     ),
   );

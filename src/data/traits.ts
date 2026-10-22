@@ -54,7 +54,7 @@ export const TRAITS: TraitDef[] = [
   T('pat.columbian', 'Columbian', '🧣', 'pattern', 'common', 'Pale body with a dark neck-lace and tail. Very formal.', 'Dominant pattern; pushes colour to the neck and tail.'),
   T('pat.laced', 'Laced', '🪡', 'pattern', 'uncommon', 'Every feather neatly edged in a darker colour, like scalloped armour.', 'Dominant over pencilled, spangled and plain feathers.'),
   T('pat.pencilled', 'Pencilled', '✏️', 'pattern', 'uncommon', 'Fine concentric lines drawn on each feather by a very patient artist.', 'Dominant over spangled and plain, recessive to laced.'),
-  T('pat.spangled', 'Spangled', '✨', 'pattern', 'uncommon', 'A dark spangle at the tip of every feather. Polka dots, but classy.', 'Dominant over plain, recessive to the other patterns.'),
+  T('pat.spangled', 'Spangled', '🔹', 'pattern', 'uncommon', 'A dark spangle at the tip of every feather. Polka dots, but classy.', 'Dominant over plain, recessive to the other patterns.'),
   T('pat.mottled', 'Mottled', '🔘', 'pattern', 'uncommon', 'White tips scattered over dark feathers, and more of them every year.', 'Recessive. Both parents must carry it.'),
   T('pat.crele', 'Crele', '🌗', 'combo', 'rare', 'Barring laid over a gold duckwing base: stripes in two colours at once.', 'Barred plus a gold duckwing base colour.'),
   T('pat.cuckoo', 'Cuckoo', '🪶', 'combo', 'uncommon', 'Soft, blurry barring on black. The rustic cousin of crisp barring.', 'Barred plus a black base.'),

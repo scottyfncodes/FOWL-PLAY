@@ -92,7 +92,7 @@ export function renderBreed(ctx: Ctx): HTMLElement {
       { class: 'egg-slot', dataset: { eggId: egg.id } },
       eggArt(eggView),
       h('div', { class: 'egg-name' }, `${egg.parentNames[0]} × ${egg.parentNames[1]}`),
-      h('button', { class: 'btn primary sm', onclick: () => ctx.openHatch(egg.id) }, '🐣 Hatch'),
+      h('button', { class: 'btn primary sm', onclick: () => ctx.openHatch(egg.id) }, 'Hatch'),
     );
   });
   for (let i = s.eggs.length; i < cap; i++) slots.push(h('div', { class: 'egg-slot empty-slot' }, 'empty nest'));
@@ -109,7 +109,7 @@ export function renderBreed(ctx: Ctx): HTMLElement {
     h(
       'div',
       { class: 'breed-cta' },
-      h('button', { class: `btn primary big ${firstTime && block.ok ? 'pulse' : ''}`, disabled: !block.ok, onclick: onBreed }, '🥚 Breed'),
+      h('button', { class: `btn primary big ${firstTime && block.ok ? 'pulse' : ''}`, disabled: !block.ok, onclick: onBreed }, 'Breed'),
       !block.ok && (A || B) ? h('p', { class: 'why' }, block.reason) : null,
     ),
     h('div', { class: 'section-h' }, 'Incubator', h('span', null, `${s.eggs.length}/${cap}`)),

@@ -34,7 +34,7 @@ function pickEntrant(ctx: Ctx, categoryId: string) {
   const cat = SHOW_BY_ID[categoryId];
   if (!cat) return;
   const list = coopChickens(ctx.state);
-  openModal(`${cat.emoji} ${cat.name}`, (close) =>
+  openModal(cat.name, (close) =>
     h(
       'div',
       null,
@@ -60,7 +60,7 @@ export function judge(ctx: Ctx, categoryId: string, chickenId: string) {
   else if (result.ribbon !== 'none') sfx.discovery();
   else sfx.tap();
   const meter = h('div', { class: 'score-meter' }, h('div', { style: { width: '0%' } }));
-  openModal(`${cat.emoji} ${cat.name}`, () =>
+  openModal(cat.name, () =>
     h(
       'div',
       { class: 'podium' },
@@ -71,7 +71,7 @@ export function judge(ctx: Ctx, categoryId: string, chickenId: string) {
       h('div', null, h('span', { class: 'ribbon' }, RIBBON_EMOJI[result.ribbon]), ' ', h('b', null, RIBBON_LABEL[result.ribbon])),
       h('p', { class: 'remark' }, `“${result.remark}”`),
       result.corn > 0 ? h('p', { class: 'small', style: { marginTop: '8px', fontWeight: '700' } }, `+${result.corn} ${CURRENCY_ICON} corn`) : h('p', { class: 'small muted', style: { marginTop: '8px' } }, result.improved && result.score > 0 ? 'A new personal best, but no ribbon this time.' : result.score === 0 ? 'The judge wrote nothing down at all.' : 'Not a new best. The judge remembers.'),
-      result.milestones.length ? h('p', { class: 'small', style: { marginTop: '6px' } }, `🏅 Milestone: ${result.milestones.map((m) => MILESTONE_BY_ID[m]?.name ?? m).join(', ')}`) : null,
+      result.milestones.length ? h('p', { class: 'small', style: { marginTop: '6px' } }, `Milestone: ${result.milestones.map((m) => MILESTONE_BY_ID[m]?.name ?? m).join(', ')}`) : null,
     ),
   );
   requestAnimationFrame(() => setTimeout(() => { (meter.firstChild as HTMLElement).style.width = `${result.score}%`; }, 50));
