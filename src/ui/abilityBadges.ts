@@ -4,14 +4,14 @@ import { openModal } from './components';
 import type { Chicken } from '../chickens/chicken';
 import { CARRIER_GENES } from '../genetics/abilities';
 
-/** Small pictorial badges for what a chicken can do. Levels shown as a number. */
+/** Small word badges for what a chicken can do. Levels shown as a number. */
 export function abilityBadgeRow(a: Abilities, opts: { max?: number; big?: boolean; onClick?: (def: AbilityDef) => void; empty?: Child } = {}): HTMLElement {
   const badges = abilityBadges(a);
   const shown = opts.max ? badges.slice(0, opts.max) : badges;
   const rest = badges.length - shown.length;
   const row = h('div', { class: `abilities ${opts.big ? 'big' : ''}` });
   for (const b of shown) {
-    const inner: Child[] = [h('span', { class: 'e', 'aria-hidden': 'true' }, b.def.emoji), opts.big ? h('span', { class: 'n' }, b.def.name) : null, b.level > 1 ? h('span', { class: 'lv' }, String(b.level)) : null];
+    const inner: Child[] = [h('span', { class: 'n' }, opts.big ? b.def.name : b.def.short), b.level > 1 ? h('span', { class: 'lv' }, String(b.level)) : null];
     const cls = `ability ${b.def.flaw ? 'flaw' : ''}`;
     row.appendChild(
       opts.onClick
@@ -47,7 +47,7 @@ export function carrierChips(chicken: Chicken): HTMLElement | null {
     chicken.knownGenes.map((id) => {
       const def = ABILITY_BY_ID[id];
       const gene = CARRIER_GENES.find((g) => g.abilityId === id);
-      return h('span', { class: 'chip carrier', title: `Proven to carry ${gene?.name ?? id}` }, h('span', { class: 'e' }, def?.emoji ?? '🧬'), `carries ${gene?.name ?? def?.name ?? id}`);
+      return h('span', { class: 'chip carrier', title: `Proven to carry ${gene?.name ?? id}` }, `carries ${gene?.name ?? def?.name ?? id}`);
     }),
   );
 }

@@ -14,6 +14,7 @@ import { sfx } from '../audio/sfx';
 import { CURRENCY_ICON } from '../data/economy';
 import { ABILITY_BY_ID } from '../genetics/abilities';
 import { CLUE_TEXT } from './clues';
+import { PAUSE_ICON } from '../ui/marks';
 
 const STEP = 1 / 60;
 
@@ -48,7 +49,7 @@ export function openFarm(ctx: Ctx, chickenId: string) {
   const renderer = new FarmRenderer(canvas);
   const missionChip = h('button', { class: 'farm-chip mission', type: 'button', onclick: () => openBoard() }, '');
   const cornChip = h('div', { class: 'farm-chip corn' }, `${CURRENCY_ICON} ${ctx.state.corn}`);
-  const pauseBtn = h('button', { class: 'farm-chip icon', type: 'button', 'aria-label': 'Pause', onclick: () => openPause() }, '⏸');
+  const pauseBtn = h('button', { class: 'farm-chip icon', type: 'button', 'aria-label': 'Pause', onclick: () => openPause(), html: PAUSE_ICON });
   const nameChip = h('div', { class: 'farm-chip name' }, chicken.name);
   const bubble = h('div', { class: 'thought', hidden: true });
   const hint = h('div', { class: 'action-hint', hidden: true });

@@ -11,8 +11,6 @@ import { CURRENCY_ICON } from '../../data/economy';
 import { sfx } from '../../audio/sfx';
 import { timeAgo } from '../components';
 
-const AREA_ICON: Record<string, string> = { breakfast: '🥣', gardenGate: '🚪', crows: '🐦‍⬛', pond: '🌊', barnDoor: '🏚️', grainChute: '⚖️', foxField: '🦊', doorbell: '🔔' };
-
 export function renderFarm(ctx: Ctx): HTMLElement {
   const s = ctx.state;
   const current = currentMission(s);
@@ -24,14 +22,14 @@ export function renderFarm(ctx: Ctx): HTMLElement {
   const map = h(
     'div',
     { class: 'farm-map' },
-    MISSIONS.map((m) => {
+    MISSIONS.map((m, i) => {
       const p = s.farm.missions[m.id];
       const state = p?.solvedAt ? 'done' : p ? 'open' : 'locked';
       const isCurrent = current?.id === m.id;
       return h(
         'button',
         { class: `map-stop ${state} ${isCurrent ? 'current' : ''} ${m.optional ? 'optional' : ''}`, type: 'button', onclick: () => showMission(ctx, m), 'aria-label': p ? m.name : 'Unknown problem' },
-        h('span', { class: 'ico' }, state === 'locked' ? '?' : AREA_ICON[m.id] ?? '•'),
+        h('span', { class: 'ico' }, state === 'locked' ? '?' : String(i + 1)),
         h('span', { class: 'lbl' }, state === 'locked' ? '· · ·' : m.name),
         state === 'done' ? h('span', { class: 'tick' }, '✓') : null,
       );
@@ -61,7 +59,7 @@ export function renderFarm(ctx: Ctx): HTMLElement {
       'div',
       { class: 'card problem-card' },
       h('div', { class: 'kicker' }, `Problem ${solvedCount + 1} of ${MAIN_MISSIONS.length}`),
-      h('h3', null, `${AREA_ICON[current.id] ?? ''} ${current.name}`),
+      h('h3', null, current.name),
       h('p', { class: 'lede' }, current.problem),
       clues.length ? h('div', { class: 'label', style: { marginTop: '10px' } }, 'What we know') : h('p', { class: 'small muted', style: { marginTop: '10px' } }, 'Nobody has poked at it properly yet. Clues turn up when a chicken tries something.'),
       clues.length ? h('ul', { class: 'clue-list' }, clues.map((id) => h('li', null, CLUE_TEXT[`${current.id}:${id}`] ?? id))) : null,
@@ -96,7 +94,6 @@ export function renderFarm(ctx: Ctx): HTMLElement {
       return h(
         'button',
         { class: 'log-mission', type: 'button', onclick: () => showMission(ctx, m) },
-        h('div', { class: 'e' }, AREA_ICON[m.id] ?? '✓'),
         h('div', { class: 'grow' }, h('div', { class: 't' }, `MISSION COMPLETE: ${m.done}`), h('div', { class: 'd' }, `${p.chickenName ?? who?.name ?? 'A chicken'} · ${sol?.label ?? 'found a way'} · ${timeAgo(p.solvedAt ?? 0)}`)),
         h('div', { class: 'r' }, `+${m.reward} ${CURRENCY_ICON}`),
       );

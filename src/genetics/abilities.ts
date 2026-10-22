@@ -102,13 +102,14 @@ export function abilitiesOf(p: Phenotype): Abilities {
 }
 
 // ---------------------------------------------------------------------------
-// Ability catalogue: player-facing names, icons and explanations.
+// Ability catalogue: player-facing names and explanations.
 // ---------------------------------------------------------------------------
 
 export interface AbilityDef {
   id: string;
   name: string;
-  emoji: string;
+  /** One-word label for compact badges. */
+  short: string;
   /** What it lets the chicken do out on the farm. */
   does: string;
   /** Breeding note revealed in the Fowldex once discovered. */
@@ -122,24 +123,24 @@ export interface AbilityDef {
 const yes = (b: boolean) => (b ? 1 : null);
 
 export const ABILITIES: AbilityDef[] = [
-  { id: 'tiny', name: 'Tiny', emoji: '🐜', does: 'Squeezes through gaps, pipes and cat flaps.', breeding: 'Comes from a very small body. Two small parents give the best odds; big chickens can still carry small.', level: (a) => yes(a.tiny) },
-  { id: 'heavy', name: 'Heavy', emoji: '⚖️', does: 'Presses heavy pressure plates just by standing on them.', breeding: 'Body size adds up across three size genes. Two giant parents make giant chicks.', level: (a) => (a.weight >= 5 ? a.weight - 3 : null) },
-  { id: 'strong', name: 'Strong', emoji: '💪', does: 'Shoves crates and breaks weak boards. Higher is stronger.', breeding: 'Size gives some strength; the brawny gene (dominant) adds more.', level: (a) => (a.strength >= 2 ? a.strength : null) },
-  { id: 'fast', name: 'Fast', emoji: '💨', does: 'Outruns things with teeth. A fox runs at 4.', breeding: 'Quick and slow pace genes add up. Long legs help; a giant body slows things down.', level: (a) => (a.speed >= 3 ? a.speed : null) },
-  { id: 'jumper', name: 'High Jumper', emoji: '🦘', does: 'Clears fences and reaches ledges. Higher is higher.', breeding: 'Springy legs (recessive: two copies), long legs and glide-ready wings all add jump. Heavy bodies and silkie fluff subtract.', level: (a) => (a.jump >= 3 ? a.jump : null) },
-  { id: 'longLegs', name: 'Long Legs', emoji: '🦵', does: 'Reaches high latches and wades through shallow water.', breeding: 'Recessive: needs the long-leg gene from both parents. Ordinary-looking chickens often carry one.', level: (a) => yes(a.longLegs) },
-  { id: 'glide', name: 'Glider', emoji: '🪽', does: 'Flaps once more in the air and floats down slowly. Crosses gaps and drops from heights.', breeding: 'Big wings (dominant) on a small body with smooth feathers. Frizzle, silkie fluff or a missing tail keep it grounded.', level: (a) => yes(a.glide) },
-  { id: 'swim', name: 'Swimmer', emoji: '🏊', does: 'Crosses deep water.', breeding: 'Webbed feet (recessive, both parents) plus feathers that shed water. Fluffy chickens sink.', level: (a) => yes(a.swim) },
-  { id: 'beak', name: 'Strong Beak', emoji: '🔨', does: 'Pecks through boards and latches other beaks bounce off.', breeding: 'Dominant beak gene. Two copies for the hardest jobs.', level: (a) => (a.beak >= 1 ? a.beak : null) },
-  { id: 'climb', name: 'Climber', emoji: '🧗', does: 'Scrambles up rough walls, posts and trellises.', breeding: 'Recessive grip gene, or one copy plus a fifth toe. Silkie fluff snags on everything, so silkies themselves stay on the ground.', level: (a) => yes(a.climb) },
-  { id: 'dig', name: 'Digger', emoji: '⛏️', does: 'Burrows through soft soil to whatever is on the other side.', breeding: 'Recessive digging gene. Feathered legs get in the way, so clean legs only.', level: (a) => yes(a.dig) },
-  { id: 'crow', name: 'Loud Crow', emoji: '📯', does: 'Scares off crows, wakes sleepers, gets attention. Louder is better.', breeding: 'Dominant crow gene. A noisy personality adds a level.', level: (a) => (a.crow >= 1 ? a.crow : null) },
-  { id: 'sneaky', name: 'Sneaky', emoji: '🥷', does: 'Predators and people notice it much later.', breeding: 'Mostly recessive habit. Two sneaky parents, or carriers with luck.', level: (a) => yes(a.sneaky) },
-  { id: 'brave', name: 'Brave', emoji: '🛡️', does: 'Does not freeze. Stands its ground against small threats.', breeding: 'Brave nerve is dominant over steady and skittish.', level: (a) => yes(a.brave && !a.aggressive) },
-  { id: 'aggressive', name: 'Aggressive', emoji: '😤', does: 'Chases off crows and anything smaller than a fox.', breeding: 'Rare dominant nerve gene.', level: (a) => yes(a.aggressive) },
-  { id: 'curious', name: 'Curious', emoji: '🔍', does: 'Notices hidden routes that others walk straight past.', breeding: 'A common temperament. Blends from both parents.', level: (a) => yes(a.curious) },
-  { id: 'greedy', name: 'Greedy', emoji: '🌽', does: 'Finds half again as much corn.', breeding: 'Dominant habit.', level: (a) => yes(a.greedy) },
-  { id: 'skittish', name: 'Skittish', emoji: '😱', does: 'Freezes for a moment when something scary shows up. A flaw, mostly.', breeding: 'Mostly recessive nerve gene.', level: (a) => yes(a.skittish), flaw: true },
+  { id: 'tiny', name: 'Tiny', short: 'Tiny', does: 'Squeezes through gaps, pipes and cat flaps.', breeding: 'Comes from a very small body. Two small parents give the best odds; big chickens can still carry small.', level: (a) => yes(a.tiny) },
+  { id: 'heavy', name: 'Heavy', short: 'Heavy', does: 'Presses heavy pressure plates just by standing on them.', breeding: 'Body size adds up across three size genes. Two giant parents make giant chicks.', level: (a) => (a.weight >= 5 ? a.weight - 3 : null) },
+  { id: 'strong', name: 'Strong', short: 'Strong', does: 'Shoves crates and breaks weak boards. Higher is stronger.', breeding: 'Size gives some strength; the brawny gene (dominant) adds more.', level: (a) => (a.strength >= 2 ? a.strength : null) },
+  { id: 'fast', name: 'Fast', short: 'Fast', does: 'Outruns things with teeth. A fox runs at 4.', breeding: 'Quick and slow pace genes add up. Long legs help; a giant body slows things down.', level: (a) => (a.speed >= 3 ? a.speed : null) },
+  { id: 'jumper', name: 'High Jumper', short: 'Jump', does: 'Clears fences and reaches ledges. Higher is higher.', breeding: 'Springy legs (recessive: two copies), long legs and glide-ready wings all add jump. Heavy bodies and silkie fluff subtract.', level: (a) => (a.jump >= 3 ? a.jump : null) },
+  { id: 'longLegs', name: 'Long Legs', short: 'Long legs', does: 'Reaches high latches and wades through shallow water.', breeding: 'Recessive: needs the long-leg gene from both parents. Ordinary-looking chickens often carry one.', level: (a) => yes(a.longLegs) },
+  { id: 'glide', name: 'Glider', short: 'Glide', does: 'Flaps once more in the air and floats down slowly. Crosses gaps and drops from heights.', breeding: 'Big wings (dominant) on a small body with smooth feathers. Frizzle, silkie fluff or a missing tail keep it grounded.', level: (a) => yes(a.glide) },
+  { id: 'swim', name: 'Swimmer', short: 'Swim', does: 'Crosses deep water.', breeding: 'Webbed feet (recessive, both parents) plus feathers that shed water. Fluffy chickens sink.', level: (a) => yes(a.swim) },
+  { id: 'beak', name: 'Strong Beak', short: 'Beak', does: 'Pecks through boards and latches other beaks bounce off.', breeding: 'Dominant beak gene. Two copies for the hardest jobs.', level: (a) => (a.beak >= 1 ? a.beak : null) },
+  { id: 'climb', name: 'Climber', short: 'Climb', does: 'Scrambles up rough walls, posts and trellises.', breeding: 'Recessive grip gene, or one copy plus a fifth toe. Silkie fluff snags on everything, so silkies themselves stay on the ground.', level: (a) => yes(a.climb) },
+  { id: 'dig', name: 'Digger', short: 'Dig', does: 'Burrows through soft soil to whatever is on the other side.', breeding: 'Recessive digging gene. Feathered legs get in the way, so clean legs only.', level: (a) => yes(a.dig) },
+  { id: 'crow', name: 'Loud Crow', short: 'Crow', does: 'Scares off crows, wakes sleepers, gets attention. Louder is better.', breeding: 'Dominant crow gene. A noisy personality adds a level.', level: (a) => (a.crow >= 1 ? a.crow : null) },
+  { id: 'sneaky', name: 'Sneaky', short: 'Sneaky', does: 'Predators and people notice it much later.', breeding: 'Mostly recessive habit. Two sneaky parents, or carriers with luck.', level: (a) => yes(a.sneaky) },
+  { id: 'brave', name: 'Brave', short: 'Brave', does: 'Does not freeze. Stands its ground against small threats.', breeding: 'Brave nerve is dominant over steady and skittish.', level: (a) => yes(a.brave && !a.aggressive) },
+  { id: 'aggressive', name: 'Aggressive', short: 'Fierce', does: 'Chases off crows and anything smaller than a fox.', breeding: 'Rare dominant nerve gene.', level: (a) => yes(a.aggressive) },
+  { id: 'curious', name: 'Curious', short: 'Curious', does: 'Notices hidden routes that others walk straight past.', breeding: 'A common temperament. Blends from both parents.', level: (a) => yes(a.curious) },
+  { id: 'greedy', name: 'Greedy', short: 'Greedy', does: 'Finds half again as much corn.', breeding: 'Dominant habit.', level: (a) => yes(a.greedy) },
+  { id: 'skittish', name: 'Skittish', short: 'Skittish', does: 'Freezes for a moment when something scary shows up. A flaw, mostly.', breeding: 'Mostly recessive nerve gene.', level: (a) => yes(a.skittish), flaw: true },
 ];
 
 export const ABILITY_BY_ID: Record<string, AbilityDef> = Object.fromEntries(ABILITIES.map((a) => [a.id, a]));

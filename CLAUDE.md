@@ -35,5 +35,3 @@ Avoid generic AI-site patterns. Design should always be intentional. Always on p
 - No "It's not X, it's Y" lines.
 - No hype phrasing ("blazing fast", "fort-knox secure", "AI magic").
 - No made-up stats ("10x", "99.9%", "120+", "∞") unless they're real.
-
-NOTE: the sandbox proxy blocks *.github.io (403), so don't try to curl Pages URLs; a successful post-merge Pages deploy run is enough evidence.

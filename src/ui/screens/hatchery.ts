@@ -62,7 +62,6 @@ function renderHatcheryBody(ctx: Ctx): HTMLElement {
     return h(
       'div',
       { class: 'upgrade' },
-      h('div', { class: 'e' }, u.emoji),
       h('div', null, h('div', { class: 't' }, u.name, level > 0 && u.costs.length > 1 ? h('span', { class: 'muted small' }, ` · level ${level}`) : level > 0 ? h('span', { class: 'muted small' }, ' · owned') : null), h('div', { class: 'd' }, u.description)),
       h('button', { class: `btn sm buy ${!maxed && s.corn >= cost ? 'primary' : ''}`, disabled: maxed || s.corn < cost, onclick: () => {
         const r = ctx.store.commit((st) => buyUpgrade(st, u.id));
@@ -83,7 +82,7 @@ function renderHatcheryBody(ctx: Ctx): HTMLElement {
     null,
     h('div', { class: 'screen-title' }, h('h2', null, 'The Hatchery'), h('span', { class: 'meta' }, `${s.corn} ${CURRENCY_ICON}`)),
     h('p', { class: 'lede' }, 'New breeds arrive here. Every adoption is a fresh set of genes to breed from, and a new page in the Fowldex. Look at what each one can do.'),
-    coopIsFull(s) ? h('div', { class: 'banner' }, '🏠', h('span', { class: 'grow' }, 'The coop is full. Retire a chicken to the meadow, or extend the coop below.')) : null,
+    coopIsFull(s) ? h('div', { class: 'banner' }, h('span', { class: 'grow' }, 'The coop is full. Retire a chicken to the meadow, or extend the coop below.')) : null,
     h('div', { class: 'grid' }, offers),
     h('div', { class: 'btn-row', style: { marginTop: '10px' } }, h('button', { class: 'btn', onclick: () => {
       const r = ctx.store.commit((st) => refreshHatchery(st, true));
