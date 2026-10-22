@@ -35,7 +35,7 @@ export function showTraitInfo(id: string) {
   const def = TRAIT_BY_ID[id];
   if (!def) return;
   openModal(
-    h('span', null, `${def.emoji} ${def.name}`),
+    h('span', null, def.name),
     () =>
       h(
         'div',
@@ -72,7 +72,7 @@ function detailBody(ctx: Ctx, chicken: Chicken, close: () => void): HTMLElement 
     'div',
     { class: 'name-row' },
     nameEditor(ctx, chicken.id, { onRenamed: () => rerender() }),
-    h('button', { class: 'btn sm ghost', 'aria-label': 'Favourite', onclick: () => { ctx.store.commit((s) => toggleFavorite(s, chicken.id)); sfx.tap(); rerender(); } }, chicken.favorite ? '⭐' : '☆'),
+    h('button', { class: 'btn sm ghost', 'aria-label': 'Favourite', onclick: () => { ctx.store.commit((s) => toggleFavorite(s, chicken.id)); sfx.tap(); rerender(); } }, chicken.favorite ? '★' : '☆'),
   );
 
   const parents = chicken.parents ? chicken.parents.map((pid) => chickenById(state, pid)) : [];
@@ -129,12 +129,12 @@ function detailBody(ctx: Ctx, chicken: Chicken, close: () => void): HTMLElement 
     ),
     h('p', { class: 'small', style: { marginTop: '10px' } }, parentLine),
     h('p', { class: 'small muted' }, ancestryText),
-    chicken.mutations.length > 0 ? h('p', { class: 'mutation-note' }, `🧬 Spontaneous mutation at conception: ${chicken.mutations.map((m) => LOCUS_BY_ID[m]?.name.toLowerCase() ?? m).join(', ')}`) : null,
+    chicken.mutations.length > 0 ? h('p', { class: 'mutation-note' }, `Spontaneous mutation at conception: ${chicken.mutations.map((m) => LOCUS_BY_ID[m]?.name.toLowerCase() ?? m).join(', ')}`) : null,
     h('div', { class: 'section-h' }, 'On the farm'),
     abilityBadgeRow(abilities, { big: true, onClick: (def) => showAbilityInfo(def), empty: 'No special abilities. Every chicken can walk, jump a little, peck and hide.' }),
-    carriers ? h('div', { style: { marginTop: '8px' } }, h('span', { class: 'label' }, 'Proven hidden genes'), carriers) : h('p', { class: 'small muted', style: { marginTop: '6px' } }, 'Hidden genes: ??? — breed it and see what the chicks show.'),
-    solvedHere.length ? h('p', { class: 'small', style: { marginTop: '6px' } }, `🏅 ${solvedHere.map((m) => `MISSION COMPLETE: ${m.done}`).join(' ')}`) : null,
-    inCoop ? h('div', { class: 'btn-row', style: { marginTop: '8px' } }, h('button', { class: 'btn primary', onclick: () => { close(); ctx.playAs(chicken.id); } }, '🌾 Take to the farm')) : null,
+    carriers ? h('div', { style: { marginTop: '8px' } }, h('span', { class: 'label' }, 'Proven hidden genes'), carriers) : h('p', { class: 'small muted', style: { marginTop: '6px' } }, 'Hidden genes: ???. Breed it and see what the chicks show.'),
+    solvedHere.length ? h('p', { class: 'small', style: { marginTop: '6px' } }, `${solvedHere.map((m) => `MISSION COMPLETE: ${m.done}`).join(' ')}`) : null,
+    inCoop ? h('div', { class: 'btn-row', style: { marginTop: '8px' } }, h('button', { class: 'btn primary', onclick: () => { close(); ctx.playAs(chicken.id); } }, 'Take to the farm')) : null,
     h('div', { class: 'detail-egg', style: { marginTop: '10px' } }, eggArt(view), h('div', { class: 'small' }, `Lays ${p.eggSize} ${EGG_WORDS[p.eggColor] ?? p.eggColor}${p.eggSpeckled ? ', speckled' : ''} eggs, ${LAY_WORDS[p.laying]}.`)),
     ...CATEGORY_ORDER.filter((c) => grouped.has(c)).map((c) =>
       h('div', { class: 'trait-group' }, h('span', { class: 'label' }, CATEGORY_LABEL[c]), h('div', { class: 'chips' }, grouped.get(c)!.map((t) => traitChip(t, { onClick: () => showTraitInfo(t) })))),
@@ -145,15 +145,15 @@ function detailBody(ctx: Ctx, chicken: Chicken, close: () => void): HTMLElement 
     h(
       'div',
       { class: 'btn-row' },
-      inCoop ? h('button', { class: 'btn primary', onclick: () => { close(); ctx.breedWith(chicken.id); } }, '🧬 Breed with…') : null,
-      inCoop ? h('button', { class: 'btn', onclick: () => { close(); enterShowPicker(ctx, chicken); } }, '🎀 Enter a show') : null,
+      inCoop ? h('button', { class: 'btn primary', onclick: () => { close(); ctx.breedWith(chicken.id); } }, 'Breed with…') : null,
+      inCoop ? h('button', { class: 'btn', onclick: () => { close(); enterShowPicker(ctx, chicken); } }, 'Enter a show') : null,
     ),
     h(
       'div',
       { class: 'btn-row', style: { marginTop: '8px' } },
       inCoop
-        ? h('button', { class: 'btn', onclick: () => confirmModal('Send to the meadow?', `${chicken.name} will retire to the meadow. They keep their place in the almanac and family trees, and you can bring them back whenever there is room.`, 'Send to meadow', () => { ctx.store.commit((s) => sendToMeadow(s, chicken.id)); toast(`${chicken.name} wandered off to the meadow. 🌾`); close(); }) }, '🌾 Send to meadow')
-        : h('button', { class: 'btn primary', onclick: () => { const r = ctx.store.commit((s) => bringBack(s, chicken.id)); if (r.ok) { toast(`${chicken.name} is back in the coop.`); close(); } else { toast(r.reason); sfx.nope(); } } }, '🏠 Bring back to coop'),
+        ? h('button', { class: 'btn', onclick: () => confirmModal('Send to the meadow?', `${chicken.name} will retire to the meadow. They keep their place in the almanac and family trees, and you can bring them back whenever there is room.`, 'Send to meadow', () => { ctx.store.commit((s) => sendToMeadow(s, chicken.id)); toast(`${chicken.name} wandered off to the meadow.`); close(); }) }, 'Send to meadow')
+        : h('button', { class: 'btn primary', onclick: () => { const r = ctx.store.commit((s) => bringBack(s, chicken.id)); if (r.ok) { toast(`${chicken.name} is back in the coop.`); close(); } else { toast(r.reason); sfx.nope(); } } }, 'Bring back to coop'),
     ),
   ]);
   return container;

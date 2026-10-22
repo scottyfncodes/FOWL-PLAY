@@ -73,8 +73,8 @@ export function renderFarm(ctx: Ctx): HTMLElement {
   const headOut = h(
     'div',
     { class: 'head-out' },
-    h('button', { class: 'btn primary big block', disabled: flock.length === 0, onclick: () => { sfx.select(); ctx.chooseOuting(); } }, '🌾 Head out'),
-    last && last.status === 'coop' ? h('button', { class: 'btn block', onclick: () => { sfx.select(); ctx.playAs(last.id); } }, `▶ Go again as ${last.name}`) : null,
+    h('button', { class: 'btn primary big block', disabled: flock.length === 0, onclick: () => { sfx.select(); ctx.chooseOuting(); } }, 'Head out'),
+    last && last.status === 'coop' ? h('button', { class: 'btn block', onclick: () => { sfx.select(); ctx.playAs(last.id); } }, `Go again as ${last.name}`) : null,
     flock.length === 0 ? h('p', { class: 'small muted' }, 'The coop is empty. Adopt or hatch a chicken first.') : null,
   );
 
@@ -109,7 +109,7 @@ export function showMission(ctx: Ctx, m: MissionDef) {
   const p = s.farm.missions[m.id];
   const clues = missionClues(s, m.id);
   const who = p?.chickenId ? chickenById(s, p.chickenId) : null;
-  openModal(p ? `${AREA_ICON[m.id] ?? ''} ${m.name}` : 'Not found yet', (close) =>
+  openModal(p ? m.name : 'Not found yet', (close) =>
     h(
       'div',
       null,
@@ -130,7 +130,7 @@ export function showMission(ctx: Ctx, m: MissionDef) {
         ? h('div', null, h('div', { class: 'section-h' }, 'Ways in'), h('p', { class: 'small muted' }, 'Now that it is done, here is everything that would have worked:'), h('ul', { class: 'clue-list' }, m.solutions.map((x) => h('li', { class: x.method === p.method ? 'used' : '' }, x.label, x.method === p.method ? ' ✓' : ''))))
         : null,
       who ? h('button', { class: 'btn sm', style: { marginTop: '8px' }, onclick: () => { close(); ctx.showChicken(who.id); } }, `See ${who.name}`) : null,
-      p && !p.solvedAt ? h('div', { class: 'btn-row', style: { marginTop: '12px' } }, h('button', { class: 'btn primary', onclick: () => { close(); ctx.chooseOuting(); } }, '🌾 Head out')) : null,
+      p && !p.solvedAt ? h('div', { class: 'btn-row', style: { marginTop: '12px' } }, h('button', { class: 'btn primary', onclick: () => { close(); ctx.chooseOuting(); } }, 'Head out')) : null,
     ),
   );
 }
@@ -162,7 +162,7 @@ function outingRow(ctx: Ctx, c: Chicken, close: () => void): HTMLElement {
     h(
       'div',
       { class: 'grow' },
-      h('div', { class: 'name' }, `#${String(c.no).padStart(3, '0')} ${c.name}`, c.favorite ? ' ⭐' : ''),
+      h('div', { class: 'name' }, `#${String(c.no).padStart(3, '0')} ${c.name}`, c.favorite ? ' ★' : ''),
       h('div', { class: 'sub' }, `Gen ${c.generation}`),
       abilityBadgeRow(a, { max: 7, onClick: (def) => showAbilityInfo(def), empty: 'An ordinary chicken. Ordinary is sometimes enough.' }),
       h('div', { class: 'tags' }, notableTraits(view, 2).map((t) => traitChip(t))),

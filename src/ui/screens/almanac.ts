@@ -72,7 +72,7 @@ function flockTab(ctx: Ctx): HTMLElement {
       h(
         'div',
         { class: 'body' },
-        h('div', { class: 'name' }, c.name.toUpperCase(), c.favorite ? ' ⭐' : ''),
+        h('div', { class: 'name' }, c.name.toUpperCase(), c.favorite ? ' ★' : ''),
         h('div', { class: 'sub' }, `Generation ${c.generation}${c.status === 'meadow' ? ' · in the meadow' : ''}`),
         h('div', { class: 'dex-line' }, h('span', { class: 'label' }, 'Can'), abilityBadgeRow(a, { max: 8, empty: 'nothing special. Yet.' })),
         h('div', { class: 'dex-line' }, h('span', { class: 'label' }, 'Hidden'), h('span', { class: 'small' }, carriers.length ? `carries ${carriers.join(', ')}${unproven ? ' · ???' : ''}` : '???')),

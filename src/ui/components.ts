@@ -102,7 +102,7 @@ export function traitChip(id: string, opts: { isNew?: boolean; onClick?: () => v
   const cls = ['chip', def.rarity !== 'common' ? def.rarity : '', opts.isNew ? 'new' : '', opts.big ? 'big' : '', opts.onClick ? 'btn-chip' : ''].join(' ');
   const inner: Child[] = [h('span', { class: 'e' }, def.emoji), def.name];
   if (opts.showOdds !== undefined) inner.push(h('span', { class: 'odds' }, `${Math.round(opts.showOdds * 100)}%`));
-  if (opts.isNew) inner.push(h('span', { class: 'e' }, '✨'));
+  if (opts.isNew) inner.push(h('span', { class: 'new-tag' }, 'new'));
   if (opts.onClick) return h('button', { class: cls, onclick: opts.onClick, type: 'button' }, ...inner);
   return h('span', { class: cls }, ...inner);
 }
@@ -141,7 +141,7 @@ export function chickenCard(chicken: Chicken, opts: { onClick?: (c: Chicken) => 
     { class: `chicken-card ${opts.selected ? 'selected' : ''} ${opts.isNew ? 'new' : ''}`, type: 'button', dataset: { chickenId: chicken.id }, onclick: () => { sfx.tap(); opts.onClick?.(chicken); } },
     h('div', { class: 'corner' }, h('span', { class: 'tag gen' }, `Gen ${chicken.generation}`), opts.showRarity !== false && view.rarity.tier !== 'common' ? rarityTag(view) : null),
     chickenArt(view),
-    h('div', { class: 'name' }, chicken.name, chicken.favorite ? h('span', { class: 'fav' }, '⭐') : null),
+    h('div', { class: 'name' }, chicken.name, chicken.favorite ? h('span', { class: 'fav', 'aria-label': 'Favourite' }, '★') : null),
     h('div', { class: 'sub' }, ancestryLabel(chicken)),
     abilityBadgeRow(abilitiesOf(view.phenotype), { max: 5 }),
     h('div', { class: 'tags' }, notableTraits(view, opts.maxTraits ?? 2).map((id) => traitChip(id))),

@@ -19,7 +19,7 @@ export function nameEditor(
   const showName = () => {
     root.replaceChildren(
       h(opts.tag ?? 'h3', { class: 'name' }, current()),
-      h('button', { class: 'btn sm ghost name-edit', type: 'button', 'aria-label': 'Rename', title: 'Give it a name', onclick: () => { sfx.tap(); showForm(); } }, opts.prompt ? `✏️ ${opts.prompt}` : '✏️'),
+      h('button', { class: 'btn sm ghost name-edit', type: 'button', 'aria-label': 'Rename', title: 'Give it a name', onclick: () => { sfx.tap(); showForm(); } }, opts.prompt ?? 'Rename'),
     );
   };
 
@@ -49,7 +49,7 @@ export function nameEditor(
         'form',
         { class: 'name-form', onsubmit: save },
         input,
-        h('button', { class: 'btn sm', type: 'button', 'aria-label': 'Suggest a name', title: 'Suggest another name', onclick: () => { sfx.tap(); input.value = suggestName(ctx.state); input.focus(); } }, '🎲'),
+        h('button', { class: 'btn sm', type: 'button', 'aria-label': 'Suggest a name', title: 'Suggest another name', onclick: () => { sfx.tap(); input.value = suggestName(ctx.state); input.focus(); } }, 'Another'),
         h('button', { class: 'btn sm primary', type: 'submit' }, 'Save'),
       ),
     );

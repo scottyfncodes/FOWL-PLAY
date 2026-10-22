@@ -26,7 +26,7 @@ export function abilityBadgeRow(a: Abilities, opts: { max?: number; big?: boolea
 
 export function showAbilityInfo(def: AbilityDef, discovered = true) {
   openModal(
-    h('span', null, `${def.emoji} ${def.name}`),
+    h('span', null, def.name),
     () =>
       h(
         'div',

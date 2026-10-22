@@ -331,7 +331,7 @@ export function openFarm(ctx: Ctx, chickenId: string) {
   const updateMissionChip = () => {
     const m = currentMission(ctx.state);
     const known = m && ctx.state.farm.missions[m.id];
-    missionChip.textContent = !m ? '🎯 All problems solved' : known ? `🎯 ${m.name}` : '🎯 Explore →';
+    missionChip.textContent = !m ? 'All problems solved' : known ? m.name : 'Explore →';
   };
   updateMissionChip();
 
@@ -369,7 +369,7 @@ export function openFarm(ctx: Ctx, chickenId: string) {
           break;
         case 'lore': {
           const l = LORE[ev.id];
-          if (l) toast(`📝 Field note: ${l.title}`, 'purple');
+          if (l) toast(`Field note: ${l.title}`, 'purple');
           stateEvents.push(ev);
           commitNeeded = true;
           break;
@@ -548,7 +548,7 @@ export function openFarm(ctx: Ctx, chickenId: string) {
         h('div', { class: 'kicker' }, 'Paused'),
         h('h2', null, chicken.name),
         h('p', { class: 'small muted' }, m ? `Current problem: ${m.name}` : 'Every problem on the farm is solved.'),
-        h('div', { class: 'farm-card-actions' }, h('button', { class: 'btn primary big', onclick: () => setOverlay(null) }, '▶ Keep going'), h('button', { class: 'btn', onclick: () => openBoard() }, '📋 The problem'), h('button', { class: 'btn', onclick: () => close('switch') }, '🐔 Switch chicken'), h('button', { class: 'btn ghost', onclick: () => close('coop') }, '🏠 Back to the coop')),
+        h('div', { class: 'farm-card-actions' }, h('button', { class: 'btn primary big', onclick: () => setOverlay(null) }, 'Keep going'), h('button', { class: 'btn', onclick: () => openBoard() }, 'The problem'), h('button', { class: 'btn', onclick: () => close('switch') }, 'Switch chicken'), h('button', { class: 'btn ghost', onclick: () => close('coop') }, 'Back to the coop')),
         h('p', { class: 'small muted controls-help' }, controlsHelp()),
       ),
     );
@@ -569,7 +569,7 @@ export function openFarm(ctx: Ctx, chickenId: string) {
         h('p', { class: 'lede' }, show ? (s.farm.missions[show.id] ? show.problem : 'Something is out there. Go and look.') : 'Head right. The farm will explain itself.'),
         clues.length ? h('div', { class: 'section-h' }, 'What we know') : null,
         clues.length ? h('ul', { class: 'clue-list' }, clues.map((id) => h('li', null, CLUE_TEXT[`${show!.id}:${id}`] ?? id))) : null,
-        h('div', { class: 'farm-card-actions' }, h('button', { class: 'btn primary big', onclick: () => setOverlay(null) }, '▶ Keep going'), h('button', { class: 'btn ghost', onclick: () => close('switch') }, '🐔 Try a different chicken')),
+        h('div', { class: 'farm-card-actions' }, h('button', { class: 'btn primary big', onclick: () => setOverlay(null) }, 'Keep going'), h('button', { class: 'btn ghost', onclick: () => close('switch') }, 'Try a different chicken')),
       ),
     );
   };
@@ -591,7 +591,7 @@ export function openFarm(ctx: Ctx, chickenId: string) {
         h('p', { class: 'lede' }, `${chicken.name}: ${sol ? sol.label.toLowerCase() : 'found a way'}.`),
         h('p', { class: 'small' }, `+${def.reward} ${CURRENCY_ICON} corn`),
         isLast ? h('p', { class: 'small muted' }, 'That was the last problem on the farm, for now. The Woods are being surveyed.') : h('p', { class: 'small muted' }, def.afterword),
-        h('div', { class: 'farm-card-actions' }, isLast ? null : h('button', { class: 'btn primary big', onclick: () => setOverlay(null) }, '▶ Keep exploring'), h('button', { class: isLast ? 'btn primary big' : 'btn', onclick: () => close('coop') }, '🏠 Back to the coop')),
+        h('div', { class: 'farm-card-actions' }, isLast ? null : h('button', { class: 'btn primary big', onclick: () => setOverlay(null) }, 'Keep exploring'), h('button', { class: isLast ? 'btn primary big' : 'btn', onclick: () => close('coop') }, 'Back to the coop')),
       ),
     );
   };

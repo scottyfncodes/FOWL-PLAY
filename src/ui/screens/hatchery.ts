@@ -13,7 +13,7 @@ export function renderHatchery(ctx: Ctx): HTMLElement {
   const tabs = h(
     'div',
     { class: 'subtabs', role: 'tablist' },
-    ...(['hatchery', 'show'] as const).map((t) => h('button', { class: ctx.ui.hatcheryTab === t ? 'active' : '', role: 'tab', onclick: () => { sfx.tap(); ctx.ui.hatcheryTab = t; ctx.rerender(); } }, { hatchery: '🏡 Hatchery', show: '🎀 Chicken Show' }[t])),
+    ...(['hatchery', 'show'] as const).map((t) => h('button', { class: ctx.ui.hatcheryTab === t ? 'active' : '', role: 'tab', onclick: () => { sfx.tap(); ctx.ui.hatcheryTab = t; ctx.rerender(); } }, { hatchery: 'Hatchery', show: 'Chicken Show' }[t])),
   );
   if (ctx.ui.hatcheryTab === 'show') return h('div', null, tabs, renderShow(ctx));
   return h('div', null, tabs, renderHatcheryBody(ctx));
@@ -37,10 +37,10 @@ function renderHatcheryBody(ctx: Ctx): HTMLElement {
       h('div', { class: 'name' }, offer.chicken.name),
       h('div', { class: 'sub' }, b?.name ?? 'Mystery'),
       h('div', { class: 'tags' }, notableTraits(v, 3).map((t) => traitChip(t))),
-      h('div', { class: 'btn-row', style: { marginTop: '8px' } }, h('button', { class: `btn sm ${canAfford ? 'primary' : ''}`, disabled: !canAfford, onclick: () => adopt() }, `Adopt · ${offer.price} ${CURRENCY_ICON}`)),
+      h('div', { class: 'btn-row', style: { marginTop: '8px' } }, h('button', { class: `btn sm ${canAfford ? 'primary' : ''}`, disabled: !canAfford, onclick: () => adopt() }, `Adopt · ${offer.price} corn`)),
     );
     function showOffer() {
-      confirmModal(`${offer.chicken.name} the ${b?.name ?? ''}`, h('span', null, b?.description ?? '', h('br'), h('br'), h('b', null, 'Eggs: '), b?.eggs ?? '', h('br'), h('b', null, 'Origin: '), b?.origin ?? ''), `Adopt for ${offer.price} ${CURRENCY_ICON}`, adopt);
+      confirmModal(`${offer.chicken.name} the ${b?.name ?? ''}`, h('span', null, b?.description ?? '', h('br'), h('br'), h('b', null, 'Eggs: '), b?.eggs ?? '', h('br'), h('b', null, 'Origin: '), b?.origin ?? ''), `Adopt for ${offer.price} corn`, adopt);
     }
     function adopt() {
       const r = ctx.store.commit((st) => buyOffer(st, offer.id));
@@ -67,7 +67,7 @@ function renderHatcheryBody(ctx: Ctx): HTMLElement {
       h('button', { class: `btn sm buy ${!maxed && s.corn >= cost ? 'primary' : ''}`, disabled: maxed || s.corn < cost, onclick: () => {
         const r = ctx.store.commit((st) => buyUpgrade(st, u.id));
         if (r.ok) { sfx.corn(); toast(`${u.name} purchased.`); } else { toast(r.reason); sfx.nope(); }
-      } }, maxed ? 'Maxed' : `${cost} ${CURRENCY_ICON}`),
+      } }, maxed ? 'Maxed' : `${cost} corn`),
     );
   });
 
@@ -75,7 +75,7 @@ function renderHatcheryBody(ctx: Ctx): HTMLElement {
     h('button', { class: `btn sm ${s.theme === t.id ? 'active' : ''}`, onclick: () => {
       const r = ctx.store.commit((st) => selectTheme(st, t.id));
       if (r.ok) { applyTheme(ctx.state.theme); sfx.select(); } else { toast(r.reason); sfx.nope(); }
-    } }, `${t.emoji} ${t.name}`, ownsTheme(s, t.id) ? '' : ` · ${t.cost} ${CURRENCY_ICON}`),
+    } }, t.name, ownsTheme(s, t.id) ? '' : ` · ${t.cost} corn`),
   );
 
   return h(
@@ -88,7 +88,7 @@ function renderHatcheryBody(ctx: Ctx): HTMLElement {
     h('div', { class: 'btn-row', style: { marginTop: '10px' } }, h('button', { class: 'btn', onclick: () => {
       const r = ctx.store.commit((st) => refreshHatchery(st, true));
       if (r.ok) { sfx.select(); } else { toast(r.reason); sfx.nope(); }
-    } }, `🔔 Call for new arrivals · ${HATCHERY_REFRESH_COST} ${CURRENCY_ICON}`)),
+    } }, `Call for new arrivals · ${HATCHERY_REFRESH_COST} corn`)),
     h('p', { class: 'small muted', style: { textAlign: 'center', marginTop: '6px' } }, `Free new arrivals after ${untilFree} more hatch${untilFree === 1 ? '' : 'es'}.`),
     h('div', { class: 'section-h' }, 'Improvements'),
     ...upgrades,
