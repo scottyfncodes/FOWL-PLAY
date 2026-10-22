@@ -10,7 +10,6 @@ import { BREED_BY_ID } from '../data/breeds';
 import { MILESTONE_BY_ID } from '../data/milestones';
 import { RARITY_LABEL } from '../genetics/traits';
 import { LOCUS_BY_ID } from '../genetics/loci';
-import { CURRENCY_ICON } from '../data/economy';
 import type { Egg } from '../state/types';
 import { ABILITY_BY_ID, CARRIER_GENES, abilitiesOf } from '../genetics/abilities';
 import { abilityBadgeRow, showAbilityInfo } from './abilityBadges';
@@ -181,7 +180,7 @@ export function revealCard(ctx: Ctx, chicken: Chicken, report: DiscoveryReport, 
     h('div', { class: 'chips' }, chips),
     ...discoveries,
     commonNew.length ? h('p', { class: 'small muted', style: { marginTop: '10px' } }, `Also new to the Almanac: ${commonNew.join(', ')}.`) : null,
-    report.corn > 0 ? h('p', { class: 'small', style: { marginTop: '10px', fontWeight: '700' } }, `+${report.corn} ${CURRENCY_ICON} corn earned`) : null,
+    report.corn > 0 ? h('p', { class: 'small', style: { marginTop: '10px', fontWeight: '700' } }, `+${report.corn} corn earned`) : null,
     h(
       'div',
       { class: 'actions' },

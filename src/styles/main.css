@@ -79,6 +79,11 @@ p { margin: 0; }
   font-weight: 700; font-variant-numeric: tabular-nums; font-size: 15px;
 }
 .corn-pill.bump { animation: bump 0.5s ease; }
+/* the drawn corn mark that stands for the currency */
+.mark-corn { --corn: color-mix(in srgb, var(--mustard) 55%, var(--card)); display: inline-flex; vertical-align: -0.2em; color: var(--ink-2); }
+.mark-corn svg { display: block; }
+.corn-pill .mark-corn { color: var(--ink); }
+.corn-pill { gap: 4px; }
 @keyframes bump { 30% { transform: scale(1.18); } }
 .icon-btn {
   width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line);

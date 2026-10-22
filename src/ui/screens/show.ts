@@ -5,7 +5,6 @@ import { RIBBON_LABEL, SHOW_BY_ID, SHOW_CATEGORIES } from '../../data/shows';
 import { chickenById, coopChickens, enterShow } from '../../state/game';
 import type { Ctx } from '../ctx';
 import { sfx } from '../../audio/sfx';
-import { CURRENCY_ICON } from '../../data/economy';
 import { MILESTONE_BY_ID } from '../../data/milestones';
 import { rosette } from '../marks';
 
@@ -69,7 +68,7 @@ export function judge(ctx: Ctx, categoryId: string, chickenId: string) {
       meter,
       h('div', null, rosette(result.ribbon), ' ', h('b', null, RIBBON_LABEL[result.ribbon])),
       h('p', { class: 'remark' }, `“${result.remark}”`),
-      result.corn > 0 ? h('p', { class: 'small', style: { marginTop: '8px', fontWeight: '700' } }, `+${result.corn} ${CURRENCY_ICON} corn`) : h('p', { class: 'small muted', style: { marginTop: '8px' } }, result.improved && result.score > 0 ? 'A new personal best, but no ribbon this time.' : result.score === 0 ? 'The judge wrote nothing down at all.' : 'Not a new best. The judge remembers.'),
+      result.corn > 0 ? h('p', { class: 'small', style: { marginTop: '8px', fontWeight: '700' } }, `+${result.corn} corn`) : h('p', { class: 'small muted', style: { marginTop: '8px' } }, result.improved && result.score > 0 ? 'A new personal best, but no ribbon this time.' : result.score === 0 ? 'The judge wrote nothing down at all.' : 'Not a new best. The judge remembers.'),
       result.milestones.length ? h('p', { class: 'small', style: { marginTop: '6px' } }, `Milestone: ${result.milestones.map((m) => MILESTONE_BY_ID[m]?.name ?? m).join(', ')}`) : null,
     ),
   );

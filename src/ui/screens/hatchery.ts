@@ -2,7 +2,7 @@ import { h } from '../dom';
 import { chickenArt, confirmModal, toast, traitChip, notableTraits } from '../components';
 import { viewOf } from '../../chickens/chicken';
 import { BREED_BY_ID } from '../../data/breeds';
-import { COOP_THEMES, CURRENCY_ICON, HATCHERY_FREE_REFRESH_EVERY, HATCHERY_REFRESH_COST, UPGRADES } from '../../data/economy';
+import { COOP_THEMES, HATCHERY_FREE_REFRESH_EVERY, HATCHERY_REFRESH_COST, UPGRADES } from '../../data/economy';
 import { buyOffer, buyUpgrade, ownsTheme, refreshHatchery, selectTheme, upgradeCost, upgradeLevel, coopIsFull } from '../../state/game';
 import type { Ctx } from '../ctx';
 import { sfx } from '../../audio/sfx';
@@ -80,7 +80,7 @@ function renderHatcheryBody(ctx: Ctx): HTMLElement {
   return h(
     'div',
     null,
-    h('div', { class: 'screen-title' }, h('h2', null, 'The Hatchery'), h('span', { class: 'meta' }, `${s.corn} ${CURRENCY_ICON}`)),
+    h('div', { class: 'screen-title' }, h('h2', null, 'The Hatchery'), h('span', { class: 'meta' }, `${s.corn} corn`)),
     h('p', { class: 'lede' }, 'New breeds arrive here. Every adoption is a fresh set of genes to breed from, and a new page in the Fowldex. Look at what each one can do.'),
     coopIsFull(s) ? h('div', { class: 'banner' }, h('span', { class: 'grow' }, 'The coop is full. Retire a chicken to the meadow, or extend the coop below.')) : null,
     h('div', { class: 'grid' }, offers),

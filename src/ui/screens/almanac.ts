@@ -9,11 +9,10 @@ import { chickenSvg, eggSvg } from '../chickenSvg';
 import { RARITY_LABEL } from '../../genetics/traits';
 import { chickenById, upgradeLevel } from '../../state/game';
 import type { Ctx } from '../ctx';
-import { CURRENCY_ICON } from '../../data/economy';
 import { showTraitInfo } from '../chickenDetail';
 import { SHOW_BY_ID } from '../../data/shows';
 import { ABILITIES, ABILITY_BY_ID, CARRIER_GENES } from '../../genetics/abilities';
-import { markLock, markTick } from '../marks';
+import { markCorn, markLock, markTick } from '../marks';
 import { abilityBadgeRow, showAbilityInfo } from '../abilityBadges';
 import { chickenArt } from '../components';
 import { viewOf, type Chicken } from '../../chickens/chicken';
@@ -248,9 +247,9 @@ function milestonesTab(ctx: Ctx): HTMLElement {
     h('div', { class: 'progress' }, h('div', { style: { width: `${(done.length / MILESTONES.length) * 100}%` } })),
     ...MILESTONES.map((m) => {
       const at = s.milestones[m.id];
-      return h('div', { class: `milestone ${at ? 'done' : 'todo'}` }, at ? markTick() : markLock(), h('div', null, h('div', { class: 't' }, m.name), h('div', { class: 'd' }, m.description)), h('div', { class: 'r' }, at ? `✓ ${timeAgo(at)}` : `+${m.reward} ${CURRENCY_ICON}`));
+      return h('div', { class: `milestone ${at ? 'done' : 'todo'}` }, at ? markTick() : markLock(), h('div', null, h('div', { class: 't' }, m.name), h('div', { class: 'd' }, m.description)), h('div', { class: 'r' }, at ? `✓ ${timeAgo(at)}` : [`+${m.reward} `, markCorn()]));
     }),
     log.length ? h('div', { class: 'section-h' }, 'Recent discoveries') : null,
-    ...log.map((e) => h('div', { class: 'log-item' }, h('span', { class: 'when' }, timeAgo(e.at)), h('span', null, describe(e)), e.corn ? h('span', { class: 'muted', style: { marginLeft: 'auto' } }, `+${e.corn} ${CURRENCY_ICON}`) : null)),
+    ...log.map((e) => h('div', { class: 'log-item' }, h('span', { class: 'when' }, timeAgo(e.at)), h('span', null, describe(e)), e.corn ? h('span', { class: 'muted', style: { marginLeft: 'auto' } }, `+${e.corn} `, markCorn()) : null)),
   );
 }

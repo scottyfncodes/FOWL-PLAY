@@ -7,7 +7,7 @@ import { abilitiesOfChicken, currentMission, missionClues, outingCandidates, sol
 import { chickenById } from '../../state/game';
 import { CLUE_TEXT } from '../../farm/clues';
 import { abilityBadgeRow, showAbilityInfo } from '../abilityBadges';
-import { CURRENCY_ICON } from '../../data/economy';
+import { markCorn } from '../marks';
 import { sfx } from '../../audio/sfx';
 import { timeAgo } from '../components';
 
@@ -95,7 +95,7 @@ export function renderFarm(ctx: Ctx): HTMLElement {
         'button',
         { class: 'log-mission', type: 'button', onclick: () => showMission(ctx, m) },
         h('div', { class: 'grow' }, h('div', { class: 't' }, `MISSION COMPLETE: ${m.done}`), h('div', { class: 'd' }, `${p.chickenName ?? who?.name ?? 'A chicken'} · ${sol?.label ?? 'found a way'} · ${timeAgo(p.solvedAt ?? 0)}`)),
-        h('div', { class: 'r' }, `+${m.reward} ${CURRENCY_ICON}`),
+        h('div', { class: 'r' }, `+${m.reward} `, markCorn()),
       );
     }),
   );
