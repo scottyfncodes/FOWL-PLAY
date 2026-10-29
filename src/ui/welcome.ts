@@ -28,7 +28,6 @@ export function renderWelcome(ctx: Ctx): HTMLElement {
       h('p', { class: 'tag-line' }, 'Every problem has a chicken. Breed it. Become it.'),
       chickenArt(view, 'hero-art'),
       h('div', { class: 'meet' }, h('span', null, 'This is'), nameEditor(ctx, starter.id, { onRenamed: () => root.replaceChildren(page1()) })),
-      h('p', { class: 'small muted' }, 'Tap Rename to give them a name of your own, or keep this one.'),
       h('p', { class: 'lede' }, `${/^[AEIOU]/.test(breed?.name ?? '') ? 'An' : 'A'} ${breed?.name ?? 'chicken'}. ${breed?.description ?? ''}`),
       h('div', { class: 'chips' }, notableTraits(view, 4).map((t) => traitChip(t))),
       h('p', { class: 'lede' }, `The farm has problems only a chicken can solve. ${name} will need help: a second chicken, ideally a very different one, and eventually the chicks you breed from them.`),

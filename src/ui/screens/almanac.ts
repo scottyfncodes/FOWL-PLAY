@@ -67,21 +67,21 @@ function flockTab(ctx: Ctx): HTMLElement {
     return h(
       'button',
       { class: `dex-entry ${c.status === 'meadow' ? 'meadow' : ''}`, type: 'button', onclick: () => ctx.showChicken(c.id) },
-      h('div', { class: 'no' }, `#${String(c.no).padStart(3, '0')}`),
+      h('div', { class: 'no' }, `No.${String(c.no).padStart(3, '0')}`),
       chickenArt(v, 'art'),
       h(
         'div',
         { class: 'body' },
-        h('div', { class: 'name' }, c.name.toUpperCase(), c.favorite ? ' ★' : ''),
+        h('div', { class: 'name' }, c.name, c.favorite ? ' ★' : ''),
         h('div', { class: 'sub' }, `Generation ${c.generation}${c.status === 'meadow' ? ' · in the meadow' : ''}`),
         h('div', { class: 'dex-line' }, h('span', { class: 'label' }, 'Can'), abilityBadgeRow(a, { max: 8, empty: 'nothing special. Yet.' })),
         h('div', { class: 'dex-line' }, h('span', { class: 'label' }, 'Hidden'), h('span', { class: 'small' }, carriers.length ? `carries ${carriers.join(', ')}${unproven ? ' · ???' : ''}` : '???')),
-        parents ? h('div', { class: 'dex-line' }, h('span', { class: 'label' }, 'Parents'), h('span', { class: 'small' }, parents.map((p) => (p ? `#${String(p.no).padStart(3, '0')} ${p.name}` : 'a departed chicken')).join(' × '))) : h('div', { class: 'dex-line' }, h('span', { class: 'label' }, 'Origin'), h('span', { class: 'small' }, c.origin === 'found' ? 'Hatched from a mystery egg' : c.origin === 'hatchery' ? 'Adopted' : c.origin === 'starter' ? 'Your first chicken' : 'Chosen on day one')),
+        parents ? h('div', { class: 'dex-line' }, h('span', { class: 'label' }, 'Parents'), h('span', { class: 'small' }, parents.map((p) => (p ? `No.${String(p.no).padStart(3, '0')} ${p.name}` : 'a departed chicken')).join(' × '))) : h('div', { class: 'dex-line' }, h('span', { class: 'label' }, 'Origin'), h('span', { class: 'small' }, c.origin === 'found' ? 'Hatched from a mystery egg' : c.origin === 'hatchery' ? 'Adopted' : c.origin === 'starter' ? 'Your first chicken' : 'Chosen on day one')),
         done.length ? h('div', { class: 'dex-line' }, h('span', { class: 'label' }, 'Solved'), h('span', { class: 'small' }, done.join(' '))) : null,
       ),
     );
   };
-  const placeholders = [0, 1, 2].map((i) => h('div', { class: 'dex-entry locked' }, h('div', { class: 'no' }, `#${String(s.farm.nextNo + i).padStart(3, '0')}`), svgBox(breedArt(BREEDS[i % BREEDS.length]!), 'art silhouette'), h('div', { class: 'body' }, h('div', { class: 'name' }, '???'), h('div', { class: 'sub' }, 'Not yet hatched'))));
+  const placeholders = [0, 1, 2].map((i) => h('div', { class: 'dex-entry locked' }, h('div', { class: 'no' }, `No.${String(s.farm.nextNo + i).padStart(3, '0')}`), svgBox(breedArt(BREEDS[i % BREEDS.length]!), 'art silhouette'), h('div', { class: 'body' }, h('div', { class: 'name' }, '???'), h('div', { class: 'sub' }, 'Not yet hatched'))));
   return h(
     'div',
     null,

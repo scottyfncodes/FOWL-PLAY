@@ -174,7 +174,8 @@ export function chickenCard(chicken: Chicken, opts: { onClick?: (c: Chicken) => 
   const card = h(
     'button',
     { class: `chicken-card ${opts.selected ? 'selected' : ''} ${opts.isNew ? 'new' : ''}`, type: 'button', dataset: { chickenId: chicken.id }, onclick: () => { sfx.tap(); opts.onClick?.(chicken); } },
-    h('div', { class: 'corner' }, h('span', { class: 'tag gen' }, `Gen ${chicken.generation}`), opts.showRarity !== false && view.rarity.tier !== 'common' ? rarityTag(view) : null),
+    // The leg band: entry number, generation and (when it matters) rarity.
+    h('div', { class: 'corner band' }, h('span', null, `No.${String(chicken.no).padStart(3, '0')}`), h('span', { class: 'tag gen' }, `Gen ${chicken.generation}`), opts.showRarity !== false && view.rarity.tier !== 'common' ? rarityTag(view) : null),
     chickenArt(view),
     h('div', { class: 'name' }, chicken.name, chicken.favorite ? h('span', { class: 'fav', 'aria-label': 'Favourite' }, '★') : null),
     h('div', { class: 'sub' }, ancestryLabel(chicken)),

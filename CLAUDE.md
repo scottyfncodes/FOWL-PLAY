@@ -35,3 +35,11 @@ Avoid generic AI-site patterns. Design should always be intentional. Always on p
 - No "It's not X, it's Y" lines.
 - No hype phrasing ("blazing fast", "fort-knox secure", "AI magic").
 - No made-up stats ("10x", "99.9%", "120+", "∞") unless they're real.
+
+## Visual system: the stud book
+
+The app is styled as a breeder's ledger kept in the barn. Keep new UI inside it (tokens and rules live at the top of `src/styles/main.css`).
+- Type: Fraunces for names and titles, Atkinson Hyperlegible for reading, Courier Prime for typed facts (labels, entry numbers, odds, counts). Labels are lower case, never letterspaced caps.
+- Ink: terracotta only for actions; moss only for farm abilities; rarity inks only for rarity. Everything else is brown on straw.
+- Lists are ruled ledger rows, not stacks of cards. Cards are for things you pick up (a chicken, an egg, the current problem).
+- Traits are square rubber stamps; abilities are solid moss tags; page heads sit on a double rule.

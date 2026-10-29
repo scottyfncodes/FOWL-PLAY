@@ -29,8 +29,9 @@ export function renderFarm(ctx: Ctx): HTMLElement {
       return h(
         'button',
         { class: `map-stop ${state} ${isCurrent ? 'current' : ''} ${m.optional ? 'optional' : ''}`, type: 'button', onclick: () => showMission(ctx, m), 'aria-label': p ? m.name : 'Unknown problem' },
-        h('span', { class: 'ico' }, state === 'locked' ? '?' : String(i + 1)),
-        h('span', { class: 'lbl' }, state === 'locked' ? '· · ·' : m.name),
+        // Stops are numbered along the path; what is there stays unknown until a chicken gets that far.
+        h('span', { class: 'ico' }, String(i + 1)),
+        h('span', { class: 'lbl' }, state === 'locked' ? (isCurrent ? 'next' : '') : m.name),
         state === 'done' ? h('span', { class: 'tick' }, '✓') : null,
       );
     }),
@@ -162,7 +163,7 @@ function outingRow(ctx: Ctx, c: Chicken, close: () => void): HTMLElement {
     h(
       'div',
       { class: 'grow' },
-      h('div', { class: 'name' }, `#${String(c.no).padStart(3, '0')} ${c.name}`, c.favorite ? ' ★' : ''),
+      h('div', { class: 'name' }, h('span', { class: 'no' }, `No.${String(c.no).padStart(3, '0')} `), c.name, c.favorite ? ' ★' : ''),
       h('div', { class: 'sub' }, `Gen ${c.generation}`),
       abilityBadgeRow(a, { max: 7, onClick: (def) => showAbilityInfo(def), empty: 'No special talents yet. Good for poking at a problem to see what it needs.' }),
       h('div', { class: 'tags' }, notableTraits(view, 2).map((t) => traitChip(t))),
