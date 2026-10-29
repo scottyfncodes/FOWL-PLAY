@@ -241,7 +241,8 @@ main.screen {
 .preview .row { margin-top: 8px; }
 .preview .row .label { margin-bottom: 4px; display: block; }
 .odds { font-size: 10px; opacity: 0.8; margin-left: 2px; }
-.breed-cta { margin-top: 14px; }
+.breed-cta { margin-top: 14px; position: sticky; bottom: calc(var(--nav-h) + var(--safe-b) + 10px); z-index: 5; }
+.breed-cta .why { background: var(--paper); border-radius: 8px; padding: 2px 6px; }
 .breed-cta .why { text-align: center; font-size: 13px; color: var(--ink-3); margin-top: 8px; }
 .pulse { animation: pulse 1.6s ease-in-out infinite; }
 @keyframes pulse { 0%, 100% { box-shadow: 0 3px 0 rgba(90, 30, 15, 0.35); } 50% { box-shadow: 0 3px 0 rgba(90, 30, 15, 0.35), 0 0 0 8px color-mix(in srgb, var(--accent) 22%, transparent); } }
@@ -351,9 +352,13 @@ main.screen {
 
 /* --------------------------------------------------------------- toasts */
 .toasts { position: fixed; top: calc(var(--header-h) + var(--safe-t) + 8px); left: 0; right: 0; z-index: 70; display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; padding: 0 12px; }
-.toast { background: var(--ink); color: #fbf6ea; padding: 10px 14px; border-radius: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); animation: toast-in 0.3s cubic-bezier(0.2, 1.2, 0.4, 1), fade-out 0.4s 3.2s forwards; max-width: 420px; display: flex; gap: 8px; align-items: center; }
-.toast.gold { background: linear-gradient(135deg, #7a4d10, #c8862f); }
-.toast.purple { background: linear-gradient(135deg, #4b2a6b, #8a4db8); }
+.toast { background: var(--ink); color: #fbf6ea; padding: 10px 14px; border-radius: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); animation: toast-in 0.3s cubic-bezier(0.2, 1.2, 0.4, 1); max-width: 420px; display: flex; gap: 8px; align-items: center; pointer-events: auto; cursor: pointer; border-left: 5px solid transparent; }
+.toast.leaving { animation: fade-out 0.25s forwards; }
+/* Gold: something went into the Fowldex. Blue: a new trait or ability turned up. */
+.toast.gold { border-left-color: var(--mustard); }
+.toast.purple { border-left-color: var(--egg-blue); }
+.toast-lines { display: flex; flex-direction: column; gap: 4px; }
+.toast-lines > div + div { font-weight: 500; color: #e6dccb; }
 @keyframes toast-in { from { transform: translateY(-10px); opacity: 0; } }
 @keyframes fade-out { to { opacity: 0; transform: translateY(-6px); } }
 

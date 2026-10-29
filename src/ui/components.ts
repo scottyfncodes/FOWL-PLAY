@@ -74,14 +74,49 @@ export function confirmModal(title: string, message: Child, confirmLabel: string
 // ---------------------------------------------------------------------------
 
 let toastRoot: HTMLElement | null = null;
-export function toast(message: Child, tone: 'default' | 'gold' | 'purple' = 'default') {
+type ToastTone = 'default' | 'gold' | 'purple';
+const toastQueue: { message: Child; tone: ToastTone }[] = [];
+let toastShowing = false;
+const TOAST_MAX_QUEUED = 3;
+
+/** Show a toast. Toasts play one at a time, so a burst never covers the screen. */
+export function toast(message: Child, tone: ToastTone = 'default') {
+  toastQueue.push({ message, tone });
+  if (toastQueue.length > TOAST_MAX_QUEUED) toastQueue.splice(0, toastQueue.length - TOAST_MAX_QUEUED);
+  if (!toastShowing) showNextToast();
+}
+
+/** Drop anything showing or waiting, e.g. when an outing starts and the screen should be clear. */
+export function clearToasts() {
+  toastQueue.length = 0;
+  toastRoot?.querySelectorAll('.toast').forEach((t) => t.classList.add('leaving'));
+}
+
+function showNextToast() {
+  const next = toastQueue.shift();
+  if (!next) {
+    toastShowing = false;
+    return;
+  }
+  toastShowing = true;
   if (!toastRoot) {
     toastRoot = h('div', { class: 'toasts', 'aria-live': 'polite' });
     document.body.appendChild(toastRoot);
   }
-  const t = h('div', { class: `toast ${tone === 'default' ? '' : tone}` }, message);
+  let done = false;
+  const t = h('div', { class: `toast ${next.tone === 'default' ? '' : next.tone}`, onclick: () => leave() }, next.message);
+  const leave = () => {
+    if (done) return;
+    done = true;
+    t.classList.add('leaving');
+    setTimeout(() => {
+      t.remove();
+      showNextToast();
+    }, 250);
+  };
   toastRoot.appendChild(t);
-  setTimeout(() => t.remove(), 3800);
+  // Shorter when more are waiting, so a queue clears quickly.
+  setTimeout(leave, toastQueue.length > 0 ? 2200 : 3200);
 }
 
 // ---------------------------------------------------------------------------

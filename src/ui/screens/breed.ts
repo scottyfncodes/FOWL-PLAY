@@ -50,7 +50,8 @@ export function renderBreed(ctx: Ctx): HTMLElement {
       list.slice(0, max).map((o) => {
         const c = traitChip(o.traitId, { showOdds: discovered.has(o.traitId) ? o.chance : undefined, onClick: discovered.has(o.traitId) ? () => showTraitInfo(o.traitId) : undefined });
         if (!discovered.has(o.traitId)) {
-          c.replaceChildren('Unknown', h('span', { class: 'odds' }, `${Math.round(o.chance * 100)}%`));
+          c.replaceChildren('Never seen', h('span', { class: 'odds' }, `${Math.round(o.chance * 100)}%`));
+          c.title = 'A trait nobody in your flock has shown yet. Breed to find out what it is.';
           c.className = 'chip unknown';
         }
         return c;
@@ -62,7 +63,7 @@ export function renderBreed(ctx: Ctx): HTMLElement {
       p.certain.length ? h('div', { class: 'row' }, h('span', { class: 'label' }, 'Certain'), h('div', { class: 'chips' }, chipsFor(p.certain, 8))) : null,
       p.likely.length ? h('div', { class: 'row' }, h('span', { class: 'label' }, 'Likely'), h('div', { class: 'chips' }, chipsFor(p.likely, 8))) : null,
       p.possible.length ? h('div', { class: 'row' }, h('span', { class: 'label' }, 'Possible'), h('div', { class: 'chips' }, chipsFor(p.possible, 10))) : null,
-      h('p', { class: 'small muted', style: { marginTop: '10px' } }, unknown > 0 ? `${unknown} outcome${unknown > 1 ? 's' : ''} you have never seen. Only one way to find out.` : 'You have seen everything this pairing can obviously do. Mutations are always possible.'),
+      h('p', { class: 'small muted', style: { marginTop: '10px' } }, unknown > 0 ? `${unknown} trait${unknown > 1 ? 's' : ''} marked "Never seen": these parents carry genes your flock has not shown yet. Hatch the egg to find out what they are.` : 'You have seen everything this pairing can obviously do. Mutations are always possible.'),
     );
   }
 
