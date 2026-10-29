@@ -81,9 +81,9 @@ p { margin: 0; }
   border-bottom: 1px solid var(--rule-strong);
 }
 .brand { display: flex; align-items: baseline; gap: 10px; }
-.brand h1 { font-size: 21px; font-style: italic; font-weight: 700; letter-spacing: 0; }
+.brand h1 { font-size: 21px; font-style: italic; font-weight: 700; letter-spacing: 0; white-space: nowrap; }
 .brand small { font-family: var(--font-mono); font-size: 12px; color: var(--ink-3); white-space: nowrap; }
-@media (max-width: 400px) { .brand small { display: none; } }
+@media (max-width: 560px) { .brand small { display: none; } }
 .header-right { display: flex; align-items: center; gap: 4px; }
 /* corn: a tally, not a pill */
 .corn-pill {
@@ -199,7 +199,9 @@ main.screen {
 .chicken-card.selected { outline: 3px solid var(--accent); outline-offset: -3px; }
 .chicken-card.new { animation: pop-in 0.5s cubic-bezier(0.2, 1.4, 0.4, 1); }
 .chicken-card .art { aspect-ratio: 4 / 3; width: 100%; background: var(--paper-2); border-bottom: 1px solid var(--rule); margin-bottom: 8px; padding: 6px 10px 0; }
-.chicken-card > :not(.art):not(.corner) { margin-left: 12px; margin-right: 12px; }
+.chicken-card > :not(.art):not(.corner):not(.btn) { margin-left: 12px; margin-right: 12px; }
+/* art wrapped in a tap target (Hatchery offers) runs edge to edge like plain art */
+.chicken-card > .btn.ghost { display: block; border-radius: 0; }
 .chicken-card .name { font-family: var(--font-display); font-size: 19px; font-weight: 700; line-height: 1.1; display: flex; align-items: baseline; gap: 4px; overflow-wrap: anywhere; }
 .chicken-card .name .fav { font-size: 14px; color: var(--accent); }
 .chicken-card .sub { font-size: 13px; color: var(--ink-2); }
