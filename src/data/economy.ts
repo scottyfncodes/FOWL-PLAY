@@ -30,7 +30,7 @@ export interface UpgradeDef {
 export const UPGRADES: UpgradeDef[] = [
   { id: 'coop', name: 'Coop Extension', description: 'Four more roosting slots in the coop.', costs: [60, 110, 170, 240, 320, 420, 540, 700] },
   { id: 'incubator', name: 'Incubator Tray', description: 'One more egg can wait in the incubator.', costs: [80, 160, 280, 450] },
-  { id: 'fieldNotes', name: 'Field Notes', description: 'Reveal inheritance hints for undiscovered traits in the Almanac.', costs: [90] },
+  { id: 'fieldNotes', name: 'Field Notes', description: 'Reveal inheritance hints for undiscovered traits in the Fowldex.', costs: [90] },
   { id: 'pedigree', name: 'Pedigree Ledger', description: 'Show ancestry three generations deep instead of two.', costs: [120] },
   { id: 'bunting', name: 'Bunting', description: 'Decorative bunting across the coop. Purely for morale.', costs: [40] },
   { id: 'nameplates', name: 'Brass Nameplates', description: 'Fancy nameplates on every chicken card.', costs: [50] },

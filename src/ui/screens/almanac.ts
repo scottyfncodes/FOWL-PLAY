@@ -107,10 +107,11 @@ function abilitiesTab(ctx: Ctx): HTMLElement {
     h(
       'div',
       { class: 'ability-grid' },
-      ABILITIES.map((a) => {
+      // Found abilities first, so the tab reads as what you have, then what is left to find.
+      [...found, ...ABILITIES.filter((a) => !s.farm.discoveredAbilities[a.id])].map((a) => {
         const d = s.farm.discoveredAbilities[a.id];
         const who = d ? chickenById(s, d.chickenId) : null;
-        if (!d) return h('button', { class: 'ability-card locked', type: 'button', onclick: () => showAbilityInfo({ ...a, name: 'Unknown ability', does: 'Nobody in your flock can do this yet. Breed towards it, or adopt someone who can.', breeding: '' }, false) }, h('div', { class: 'n' }, '· · ·'), h('div', { class: 'd' }, a.flaw ? 'A flaw' : 'Undiscovered'));
+        if (!d) return h('button', { class: 'ability-card locked', type: 'button', onclick: () => showAbilityInfo({ ...a, name: 'Unknown ability', does: `${a.hint ? `${a.hint} ` : ''}Nobody in your flock can do this yet. Breed towards it, or adopt someone who can.`, breeding: '' }, false) }, h('div', { class: 'n' }, a.flaw ? 'A flaw' : 'Not found yet'), h('div', { class: 'd' }, a.hint ?? ''));
         return h('button', { class: `ability-card ${a.flaw ? 'flaw' : ''}`, type: 'button', onclick: () => showAbilityInfo(a) }, h('div', { class: 'n' }, a.name), h('div', { class: 'd' }, a.does), who ? h('div', { class: 'w' }, `first seen: ${who.name}`) : null);
       }),
     ),
@@ -163,7 +164,7 @@ export function showBreed(ctx: Ctx, b: BreedDef) {
       'div',
       null,
       h('div', { class: `detail-hero ${disc ? '' : 'locked-hero'}` }, h('div', { class: `breed-card ${disc ? '' : 'locked'}`, style: { padding: 0, border: 0, boxShadow: 'none' } }, svgBox(breedArt(b), 'art')), h('div', { class: 'facts' }, disc ? [h('div', null, h('b', null, 'Origin: '), b.origin), h('div', { class: 'detail-egg' }, svgBox(eggSvg(p.eggColor, p.eggSpeckled, p.eggSize, { uid: `beg-${b.id}` }), 'egg'), h('span', null, h('b', null, 'Eggs: '), b.eggs)), h('div', null, h('b', null, 'Rarity: '), '★'.repeat(b.tier))] : [h('div', null, h('b', null, 'Rarity: '), '★'.repeat(b.tier)), h('div', { class: 'muted' }, 'Origin unknown until recorded.')])),
-      disc ? h('p', { class: 'lede', style: { marginTop: '12px' } }, b.description) : h('p', { class: 'lede', style: { marginTop: '12px' } }, 'Only a silhouette so far. Adopt one from the Hatchery, or breed a chicken that looks the part and the Almanac will count it.'),
+      disc ? h('p', { class: 'lede', style: { marginTop: '12px' } }, b.description) : h('p', { class: 'lede', style: { marginTop: '12px' } }, 'Only a silhouette so far. Adopt one from the Hatchery, or breed a chicken that looks the part and the Fowldex will count it.'),
       h('div', { class: 'section-h' }, 'Notable traits'),
       disc || notes ? h('div', { class: 'chips' }, b.notable.map((n) => h('span', { class: 'chip' }, n))) : h('p', { class: 'small muted' }, 'Buy Field Notes in the Hatchery to see hints for undiscovered breeds.'),
       disc && b.signature.length ? h('div', null, h('div', { class: 'section-h' }, 'Look-alike signature'), h('div', { class: 'chips' }, b.signature.map((sig) => h('span', { class: 'chip' }, sig.startsWith('!') ? `no ${TRAIT_BY_ID[sig.slice(1)]?.name ?? sig.slice(1)}` : sig.split('|').map((x) => TRAIT_BY_ID[x]?.name ?? x).join(' or '))))) : null,
@@ -227,7 +228,7 @@ function milestonesTab(ctx: Ctx): HTMLElement {
       case 'trait':
         return `${who ?? 'Someone'} revealed ${TRAIT_BY_ID[e.refId]?.name ?? 'a trait'}`;
       case 'breed':
-        return `${BREED_BY_ID[e.refId]?.name ?? 'A breed'} recorded in the Almanac`;
+        return `${BREED_BY_ID[e.refId]?.name ?? 'A breed'} recorded in the Fowldex`;
       case 'resemblance':
         return `${who ?? 'A chick'} hatched looking like a ${BREED_BY_ID[e.refId]?.name ?? 'breed'}`;
       case 'milestone':

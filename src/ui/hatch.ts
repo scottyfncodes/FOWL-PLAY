@@ -137,7 +137,10 @@ export function revealCard(ctx: Ctx, chicken: Chicken, report: DiscoveryReport, 
     delay += 0.15;
     discoveries.push(d);
   };
+  // Everyday finds go in one compact list; only the big moments get their own card.
   const commonNew: string[] = [];
+  const quickFinds: HTMLElement[] = [];
+  const addQuick = (title: string, desc: string) => quickFinds.push(h('li', null, h('b', null, title), ` ${desc}`));
   for (const t of report.newTraits) {
     const def = TRAIT_BY_ID[t];
     if (!def) continue;
@@ -146,16 +149,20 @@ export function revealCard(ctx: Ctx, chicken: Chicken, report: DiscoveryReport, 
       continue;
     }
     const rare = def.rarity === 'rare' || def.rarity === 'exotic';
+    if (!rare && def.rarity !== 'legendary') {
+      addQuick(`${def.name}.`, def.description);
+      continue;
+    }
     addDisc(def.rarity === 'legendary' ? 'legendary-d' : rare ? 'rare-d' : '', `New trait discovered · ${RARITY_LABEL[def.rarity]}`, def.name, rare || def.rarity === 'legendary' ? TRAIT_KICKERS[(t.length + chicken.seed) % TRAIT_KICKERS.length]! + ' ' + def.description : def.description);
   }
   for (const b of report.newBreeds) {
     const def = BREED_BY_ID[b.id];
     if (!def) continue;
-    addDisc('', b.how === 'resemblance' ? 'Almanac: look-alike bred' : 'New breed in the Almanac', def.name, b.how === 'resemblance' ? `${chicken.name} looks enough like a ${def.name} that the Almanac counts it.` : def.description);
+    addQuick(`${def.name} breed.`, b.how === 'resemblance' ? `${chicken.name} looks enough like one that the Fowldex counts it.` : def.description);
   }
   for (const m of report.milestones) {
     const def = MILESTONE_BY_ID[m];
-    if (def) addDisc('', 'Milestone', def.name, def.description);
+    if (def) addQuick(`Milestone: ${def.name}.`, def.description);
   }
   if (report.mutated) addDisc('rare-d', 'Mutation', 'Something changed on its own', `A spontaneous change at: ${chicken.mutations.map((m) => LOCUS_BY_ID[m]?.name.toLowerCase() ?? m).join(', ')}. This was not inherited from either parent.`);
   for (const id of report.newAbilities) {
@@ -179,7 +186,8 @@ export function revealCard(ctx: Ctx, chicken: Chicken, report: DiscoveryReport, 
     abilityBadgeRow(abilitiesOf(view.phenotype), { big: true, onClick: (def) => showAbilityInfo(def) }),
     h('div', { class: 'chips' }, chips),
     ...discoveries,
-    commonNew.length ? h('p', { class: 'small muted', style: { marginTop: '10px' } }, `Also new to the Almanac: ${commonNew.join(', ')}.`) : null,
+    quickFinds.length ? h('div', { class: 'quick-finds' }, h('div', { class: 'k' }, 'New in the Fowldex'), h('ul', null, quickFinds)) : null,
+    commonNew.length ? h('p', { class: 'small muted', style: { marginTop: '10px' } }, `Also new: ${commonNew.join(', ')}.`) : null,
     report.corn > 0 ? h('p', { class: 'small', style: { marginTop: '10px', fontWeight: '700' } }, `+${report.corn} corn earned`) : null,
     h(
       'div',
