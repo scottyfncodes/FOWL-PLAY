@@ -232,3 +232,21 @@ test('layout has no horizontal overflow', async ({ page }) => {
     expect(overflow, `${tab} overflows horizontally`).toBeLessThanOrEqual(0);
   }
 });
+
+test('discoveries show as one toast, not a stack', async ({ page }) => {
+  await completeWelcome(page);
+  await expect(page.locator('.toast:not(.leaving)')).toHaveCount(1);
+});
+
+test('the Breed button is on screen without scrolling', async ({ page }) => {
+  await completeWelcome(page);
+  await page.click('.nav button:has-text("Breed")');
+  const btn = page.locator('.breed-cta .btn.primary');
+  await expect(btn).toBeEnabled();
+  await expect(page.locator('.chip.unknown').first()).toContainText('Never seen');
+  const [btnBottom, navTop] = await page.evaluate(() => [
+    document.querySelector('.breed-cta .btn')!.getBoundingClientRect().bottom,
+    document.querySelector('.nav')!.getBoundingClientRect().top,
+  ]);
+  expect(btnBottom).toBeLessThanOrEqual(navTop);
+});

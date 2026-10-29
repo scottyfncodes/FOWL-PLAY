@@ -162,29 +162,34 @@ export class App implements Ctx {
 
   announce(report: DiscoveryReport, chicken?: Chicken | null) {
     const who = chicken?.name ?? 'A chicken';
-    let any = false;
+    // Everything one event discovered goes into a single toast, so they never stack.
+    const lines: string[] = [];
+    let tone: 'default' | 'gold' | 'purple' = 'default';
+    const bump = (t: 'gold' | 'purple') => { if (tone !== 'gold') tone = t; };
+    for (const b of report.newBreeds) {
+      lines.push(`${BREED_BY_ID[b.id]?.name ?? 'Breed'} added to the Fowldex${b.how === 'resemblance' ? ` (${who} looks the part)` : ''}`);
+      bump('gold');
+    }
+    if (report.milestones.length > 0) {
+      lines.push(`Milestone: ${report.milestones.map((m) => MILESTONE_BY_ID[m]?.name ?? m).join(' · ')}`);
+      bump('gold');
+    }
+    if (report.newAbilities.length > 0) {
+      lines.push(`New ability in the flock: ${report.newAbilities.map((a) => ABILITY_BY_ID[a]?.name ?? a).join(', ')}`);
+      bump('purple');
+    }
     const traitDefs = report.newTraits.map((t) => TRAIT_BY_ID[t]).filter((d): d is NonNullable<typeof d> => !!d);
     if (traitDefs.length > 0) {
-      any = true;
       const rank = { common: 0, uncommon: 1, rare: 2, exotic: 3, legendary: 4 };
       const top = [...traitDefs].sort((a, b) => rank[b.rarity] - rank[a.rarity]).slice(0, 3);
       const rest = traitDefs.length - top.length;
-      const tone = top.some((d) => d.rarity === 'legendary') ? 'gold' : top.some((d) => d.rarity === 'rare' || d.rarity === 'exotic') ? 'purple' : 'default';
-      toast(`New trait${traitDefs.length > 1 ? 's' : ''}: ${top.map((d) => d.name).join(', ')}${rest > 0 ? ` and ${rest} more` : ''}`, tone);
+      lines.push(`New trait${traitDefs.length > 1 ? 's' : ''}: ${top.map((d) => d.name).join(', ')}${rest > 0 ? ` and ${rest} more` : ''}`);
+      if (top.some((d) => d.rarity === 'legendary')) bump('gold');
+      else if (top.some((d) => d.rarity === 'rare' || d.rarity === 'exotic')) bump('purple');
     }
-    if (report.newAbilities.length > 0) {
-      any = true;
-      toast(`New ability in the flock: ${report.newAbilities.map((a) => ABILITY_BY_ID[a]?.name ?? a).join(', ')}`, 'purple');
-    }
-    for (const b of report.newBreeds) {
-      any = true;
-      toast(`${BREED_BY_ID[b.id]?.name ?? 'Breed'} added to the Fowldex${b.how === 'resemblance' ? ` (${who} looks the part)` : ''}`, 'gold');
-    }
-    if (report.milestones.length > 0) {
-      any = true;
-      toast(`Milestone: ${report.milestones.map((m) => MILESTONE_BY_ID[m]?.name ?? m).join(' · ')}`, 'gold');
-    }
-    if (any) sfx.discovery();
-    if (report.corn > 0) this.toastCorn(report.corn);
+    if (report.corn > 0) lines.push(`+${report.corn} corn`);
+    if (lines.length === 0) return;
+    if (lines.length > (report.corn > 0 ? 1 : 0)) sfx.discovery();
+    toast(lines.length === 1 ? lines[0] : h('div', { class: 'toast-lines' }, lines.map((l) => h('div', null, l))), tone);
   }
 }

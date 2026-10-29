@@ -9,7 +9,7 @@ import { FarmRenderer, computeCamera, type Camera, type ChickenDrawState } from 
 import { spritesFor, type FrameName } from './sprites';
 import type { Input, WorldEvent } from './types';
 import { LORE, MISSION_BY_ID, MISSIONS } from './missions';
-import { chickenArt, toast } from '../ui/components';
+import { chickenArt, clearToasts, toast } from '../ui/components';
 import { sfx } from '../audio/sfx';
 import { ABILITY_BY_ID } from '../genetics/abilities';
 import { CLUE_TEXT } from './clues';
@@ -27,6 +27,7 @@ export function openFarm(ctx: Ctx, chickenId: string) {
   const chicken = chickenById(ctx.state, chickenId);
   if (!chicken || chicken.status !== 'coop') return;
   if (!ctx.store.commit((s) => startOuting(s, chickenId))) return;
+  clearToasts();
   const view = viewOf(chicken);
   const abilities = abilitiesOfChicken(chicken);
   const s0 = ctx.state;
