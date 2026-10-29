@@ -527,7 +527,7 @@ export function openFarm(ctx: Ctx, chickenId: string) {
     draw.squashX = sx;
     draw.squashY = sy;
     draw.alpha = c.hidden ? 0.55 : 1;
-    cam = computeCamera(world, root.clientWidth, root.clientHeight, cam, dt);
+    cam = computeCamera(world, root.clientWidth, root.clientHeight, cam, dt, controls.offsetHeight);
     renderer.draw(world, cam, sprites, draw, paused ? 0 : dt);
   };
   raf = requestAnimationFrame(frame);

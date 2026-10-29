@@ -250,3 +250,12 @@ test('the Breed button is on screen without scrolling', async ({ page }) => {
   ]);
   expect(btnBottom).toBeLessThanOrEqual(navTop);
 });
+
+test('Fowldex lists found abilities first and hints at the rest', async ({ page }) => {
+  await completeWelcome(page);
+  await page.click('.nav button:has-text("Fowldex")');
+  await page.click('.subtabs button:has-text("Abilities")');
+  const cards = page.locator('.ability-card');
+  await expect(cards.first()).not.toHaveClass(/locked/);
+  await expect(page.locator('.ability-card.locked .d').first()).not.toBeEmpty();
+});

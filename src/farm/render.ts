@@ -73,7 +73,12 @@ export interface ChickenDrawState {
   alpha: number;
 }
 
-export function computeCamera(world: World, viewW: number, viewH: number, prev: Camera | null, dt: number): Camera {
+/**
+ * `bottomInset` is how many screen px at the bottom are covered by touch controls.
+ * In portrait the ground is kept just above them, so the controls sit on the dirt
+ * instead of on top of the chicken and the problem it is solving.
+ */
+export function computeCamera(world: World, viewW: number, viewH: number, prev: Camera | null, dt: number, bottomInset = 0): Camera {
   // Show about 420 world px vertically on phones, a bit more on wide screens.
   const targetRows = viewW > viewH ? 460 : 360;
   let scale = viewH / targetRows;
@@ -85,6 +90,14 @@ export function computeCamera(world: World, viewW: number, viewH: number, prev: 
   const portrait = viewH > viewW;
   let tx = c.x + lookAhead - w / 2;
   let ty = c.y - h * (portrait ? 0.72 : 0.64);
+  if (portrait && bottomInset > 0) {
+    // Hold the ground steady a bit above the middle-low of the screen, clear of the
+    // controls, and only move when the chicken climbs high or drops below ground.
+    const groundScreenY = Math.min(viewH * 0.64, viewH - bottomInset - 18);
+    ty = GROUND_Y - groundScreenY / scale;
+    ty = Math.min(ty, c.y - h * 0.4);
+    ty = Math.max(ty, c.y - groundScreenY / scale);
+  }
   tx = Math.max(0, Math.min(world.level.width - w, tx));
   ty = Math.max(-120, Math.min(WORLD_H - h + 40, ty));
   if (!prev || prev.scale !== scale) return { x: tx, y: ty, scale, viewW, viewH };
@@ -321,6 +334,12 @@ export class FarmRenderer {
     // Grass strip at ground level
     ctx.fillStyle = '#9ec07a';
     ctx.fillRect(cam.x - 40, horizon - 14, cam.viewW / cam.scale + 80, 14);
+    // Solid dirt below the bottom of the world, where the portrait camera can look.
+    const viewBottom = cam.y + cam.viewH / cam.scale + 40;
+    if (viewBottom > WORLD_H - 4) {
+      ctx.fillStyle = PAL.dirt;
+      ctx.fillRect(cam.x - 40, WORLD_H - 4, cam.viewW / cam.scale + 80, viewBottom - WORLD_H + 4);
+    }
     void world;
   }
 

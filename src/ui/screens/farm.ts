@@ -51,7 +51,7 @@ export function renderFarm(ctx: Ctx): HTMLElement {
       { class: 'card problem-card' },
       h('div', { class: 'kicker' }, solvedCount === 0 ? 'Where to begin' : 'Next'),
       h('h3', null, solvedCount === 0 ? 'Something needs doing out there.' : 'Keep going right.'),
-      h('p', { class: 'lede' }, solvedCount === 0 ? 'Take a chicken out. Walk right. The farm has problems, and every problem has a chicken.' : `Past ${MAIN_MISSIONS[solvedCount - 1]?.name.toLowerCase() ?? 'the last one'} there is more farm. Nobody has looked yet.`),
+      h('p', { class: 'lede' }, solvedCount === 0 ? 'Take a chicken out. Walk right. The farm has problems, and every problem has a chicken.' : `${MAIN_MISSIONS[solvedCount - 1]?.afterword ?? ''} Further right there is more farm. Nobody has looked yet.`.trim()),
     );
   } else {
     const clues = missionClues(s, current.id);
@@ -61,10 +61,13 @@ export function renderFarm(ctx: Ctx): HTMLElement {
       h('div', { class: 'kicker' }, `Problem ${solvedCount + 1} of ${MAIN_MISSIONS.length}`),
       h('h3', null, current.name),
       h('p', { class: 'lede' }, current.problem),
-      clues.length ? h('div', { class: 'label', style: { marginTop: '10px' } }, 'What we know') : h('p', { class: 'small muted', style: { marginTop: '10px' } }, 'Nobody has poked at it properly yet. Clues turn up when a chicken tries something.'),
-      clues.length ? h('ul', { class: 'clue-list' }, clues.map((id) => h('li', null, CLUE_TEXT[`${current.id}:${id}`] ?? id))) : null,
+      // The newest clue is the chicken's own words about what it could not do: lead with it.
+      clues.length ? h('blockquote', { class: 'latest-clue' }, h('div', { class: 'label' }, 'Last time out'), CLUE_TEXT[`${current.id}:${clues[clues.length - 1]}`] ?? clues[clues.length - 1]!) : h('p', { class: 'small muted', style: { marginTop: '10px' } }, 'Nobody has poked at it properly yet. Clues turn up when a chicken tries something.'),
+      clues.length > 1 ? h('div', { class: 'label', style: { marginTop: '10px' } }, 'Also known') : null,
+      clues.length > 1 ? h('ul', { class: 'clue-list' }, clues.slice(0, -1).reverse().map((id) => h('li', null, CLUE_TEXT[`${current.id}:${id}`] ?? id))) : null,
       progress.attempts > 1 ? h('p', { class: 'small muted' }, `${progress.attempts} outings so far.`) : null,
       h('p', { class: 'think' }, 'What kind of chicken could do this?'),
+      clues.length ? h('button', { class: 'btn sm', style: { marginTop: '6px' }, onclick: () => { sfx.select(); ctx.navigate('breed'); } }, 'Breed for it') : null,
     );
   }
 
@@ -161,7 +164,7 @@ function outingRow(ctx: Ctx, c: Chicken, close: () => void): HTMLElement {
       { class: 'grow' },
       h('div', { class: 'name' }, `#${String(c.no).padStart(3, '0')} ${c.name}`, c.favorite ? ' ★' : ''),
       h('div', { class: 'sub' }, `Gen ${c.generation}`),
-      abilityBadgeRow(a, { max: 7, onClick: (def) => showAbilityInfo(def), empty: 'An ordinary chicken. Ordinary is sometimes enough.' }),
+      abilityBadgeRow(a, { max: 7, onClick: (def) => showAbilityInfo(def), empty: 'No special talents yet. Good for poking at a problem to see what it needs.' }),
       h('div', { class: 'tags' }, notableTraits(view, 2).map((t) => traitChip(t))),
     ),
     h('button', { class: 'btn primary', onclick: () => { sfx.select(); close(); ctx.playAs(c.id); } }, 'Go'),
