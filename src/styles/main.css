@@ -127,6 +127,7 @@ main.screen {
 }
 .nav button .ico { line-height: 0; }
 .nav button .ico svg { width: 24px; height: 24px; }
+.nav button:active { background: var(--paper-2); }
 .nav button.active { color: var(--ink); }
 /* the current page is marked like a ribbon tab across the top rule */
 .nav button.active::before { content: ''; position: absolute; top: -1px; left: 22%; right: 22%; height: 3px; background: var(--accent); }
@@ -515,11 +516,13 @@ body:has(.welcome-root) .toasts, body:has(.hatch-root) .toasts { top: auto; bott
 /* --------------------------------------------------------------- settings */
 .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
 textarea.save-box { width: 100%; min-height: 90px; border-radius: var(--radius-sm); border: 1px solid var(--rule-strong); padding: 8px; font-family: var(--font-mono); font-size: 12px; background: var(--paper); color: var(--ink); }
+/* 16 px on touch screens so iOS does not zoom when the field is focused. */
+@media (pointer: coarse) { textarea.save-box { font-size: 16px; } }
 input.text { width: 100%; min-height: 44px; border-radius: var(--radius-sm); border: 1.5px solid var(--ink); padding: 8px 12px; font-size: 16px; background: var(--card); color: var(--ink); }
 .hint-callout { position: relative; margin: 8px 0 12px; padding: 10px 12px; border-radius: var(--radius); background: var(--ink); color: #fbf6ea; font-size: 15px; font-weight: 700; text-align: center; animation: pop-in 0.5s; }
 .hint-callout::after { content: ''; position: absolute; left: 50%; bottom: -7px; width: 14px; height: 14px; background: var(--ink); transform: translateX(-50%) rotate(45deg); }
 .bunting { height: 22px; background-image: linear-gradient(135deg, var(--accent) 25%, transparent 25%), linear-gradient(225deg, var(--accent) 25%, transparent 25%), linear-gradient(135deg, var(--mustard) 25%, transparent 25%), linear-gradient(225deg, var(--mustard) 25%, transparent 25%); background-size: 24px 22px, 24px 22px, 24px 22px, 24px 22px; background-position: 0 0, 0 0, 24px 0, 24px 0; background-repeat: repeat-x; margin: -18px -16px 12px; opacity: 0.85; }
-.sort-select { min-height: 40px; border-radius: var(--radius-sm); border: 1.5px solid var(--ink); background: var(--card); padding: 4px 8px; font-size: 15px; font-weight: 700; color: var(--ink); }
+.sort-select { min-height: 44px; border-radius: var(--radius-sm); border: 1.5px solid var(--ink); background: var(--card); padding: 4px 8px; font-size: 16px; font-weight: 700; color: var(--ink); }
 .filter-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
 .filter-row .small { font-family: var(--font-mono); }
 .selected-ring { outline: 3px solid var(--accent); outline-offset: -3px; }
@@ -556,6 +559,7 @@ input.text { width: 100%; min-height: 44px; border-radius: var(--radius-sm); bor
   flex: 0 0 auto; width: 88px; padding: 4px 4px 6px; border: 0; background: transparent;
   display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; scroll-snap-align: start; color: var(--ink);
 }
+.map-stop:active .ico { transform: translateY(1px); background: var(--paper-2); }
 /* the path between stops */
 .map-stop::before { content: ''; position: absolute; top: 21px; left: -50%; right: 50%; border-top: 2px dashed var(--rule-strong); z-index: 0; }
 .map-stop:first-child::before { display: none; }
