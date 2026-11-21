@@ -14,7 +14,7 @@ export function renderShow(ctx: Ctx): HTMLElement {
   return h(
     'div',
     null,
-    h('div', { class: 'screen-title' }, h('h2', null, 'The Chicken Show'), h('span', { class: 'meta' }, `${Object.values(s.ribbons).filter((r) => r.ribbon !== 'none').length} ribbons`)),
+    h('div', { class: 'screen-title' }, h('h1', null, 'The Chicken Show'), h('span', { class: 'meta' }, `${Object.values(s.ribbons).filter((r) => r.ribbon !== 'none').length} ribbons`)),
     h('p', { class: 'lede' }, 'Nine very silly categories, one very serious judge. Enter any chicken; beat your own best to earn corn.'),
     ...SHOW_CATEGORIES.map((cat) => {
       const best = s.ribbons[cat.id];

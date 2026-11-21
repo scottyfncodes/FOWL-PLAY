@@ -41,6 +41,10 @@ npm run e2e        # Playwright end-to-end tests against the built site (iPhone 
 
 `tools/farmtest.mjs` plays through the first mission at iPhone size taking screenshots; `tools/playtest.mjs` walks the breeding side; `tools/gallery.ts` renders every breed; `tools/icons.mjs` regenerates the app icons from `public/icons/icon.svg`.
 
+## Assets
+
+Everything you see is drawn in code for this project: the chickens and the farm are generated SVG and canvas drawing, sound effects are synthesised at runtime, and the app icon is original artwork (`public/icons/icon.svg`, rendered to PNG by `tools/icons.mjs`). There are no third-party images, sounds or icon sets. Fonts (Fraunces, Atkinson Hyperlegible, Courier Prime) load from Google Fonts under the SIL Open Font License.
+
 ## Deployment
 
 Pushes to `main` run tests, build with the `/FOWL-PLAY/` base path and deploy to GitHub Pages via `.github/workflows/deploy.yml`.

@@ -9,11 +9,10 @@ import { nameEditor } from './nameEditor';
 
 /** First-run flow: meet your chicken, choose a second one, land in the breeding pen. */
 export function renderWelcome(ctx: Ctx): HTMLElement {
-  const root = h('div', { class: 'welcome-root' });
+  const root = h('div', { class: 'welcome-root', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Welcome to Fowl Play' });
   const starter = chickenById(ctx.state, ctx.state.starterId);
   if (!starter) {
     ctx.store.commit((s) => { s.onboarding = 'done'; });
-    root.remove();
     return root;
   }
   const view = viewOf(starter);
@@ -27,7 +26,7 @@ export function renderWelcome(ctx: Ctx): HTMLElement {
       h('h1', null, 'Fowl Play'),
       h('p', { class: 'tag-line' }, 'Every problem has a chicken. Breed it. Become it.'),
       chickenArt(view, 'hero-art'),
-      h('div', { class: 'meet' }, h('span', null, 'This is'), nameEditor(ctx, starter.id, { onRenamed: () => root.replaceChildren(page1()) })),
+      h('div', { class: 'meet' }, h('span', null, 'This is'), nameEditor(ctx, starter.id, { tag: 'h2', onRenamed: () => root.replaceChildren(page1()) })),
       h('p', { class: 'lede' }, `${/^[AEIOU]/.test(breed?.name ?? '') ? 'An' : 'A'} ${breed?.name ?? 'chicken'}. ${breed?.description ?? ''}`),
       h('div', { class: 'chips' }, notableTraits(view, 4).map((t) => traitChip(t))),
       h('p', { class: 'lede' }, `The farm has problems only a chicken can solve. ${name} will need help: a second chicken, ideally a very different one, and eventually the chicks you breed from them.`),
@@ -67,6 +66,7 @@ export function renderWelcome(ctx: Ctx): HTMLElement {
     ctx.ui.parentA = starter.id;
     ctx.ui.parentB = second?.id ?? null;
     root.remove();
+    document.getElementById('app')?.removeAttribute('inert');
     ctx.navigate('farm');
     if (report) ctx.announce(report, second ?? null);
   };

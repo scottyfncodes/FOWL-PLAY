@@ -43,7 +43,7 @@ export function renderFarm(ctx: Ctx): HTMLElement {
       'div',
       { class: 'card problem-card done-all' },
       h('div', { class: 'kicker' }, 'The farm'),
-      h('h3', null, 'Every problem solved.'),
+      h('h2', null, 'Every problem solved.'),
       h('p', { class: 'lede' }, 'The farmer has met a chicken at the door and is thinking about it. The Woods are being surveyed for the next update. Until then, the farm is yours to wander.'),
     );
   } else if (!progress) {
@@ -51,7 +51,7 @@ export function renderFarm(ctx: Ctx): HTMLElement {
       'div',
       { class: 'card problem-card' },
       h('div', { class: 'kicker' }, solvedCount === 0 ? 'Where to begin' : 'Next'),
-      h('h3', null, solvedCount === 0 ? 'Something needs doing out there.' : 'Keep going right.'),
+      h('h2', null, solvedCount === 0 ? 'Something needs doing out there.' : 'Keep going right.'),
       h('p', { class: 'lede' }, solvedCount === 0 ? 'Take a chicken out. Walk right. The farm has problems, and every problem has a chicken.' : `${MAIN_MISSIONS[solvedCount - 1]?.afterword ?? ''} Further right there is more farm. Nobody has looked yet.`.trim()),
     );
   } else {
@@ -60,7 +60,7 @@ export function renderFarm(ctx: Ctx): HTMLElement {
       'div',
       { class: 'card problem-card' },
       h('div', { class: 'kicker' }, `Problem ${solvedCount + 1} of ${MAIN_MISSIONS.length}`),
-      h('h3', null, current.name),
+      h('h2', null, current.name),
       h('p', { class: 'lede' }, current.problem),
       // The newest clue is the chicken's own words about what it could not do: lead with it.
       clues.length ? h('blockquote', { class: 'latest-clue' }, h('div', { class: 'label' }, 'Last time out'), CLUE_TEXT[`${current.id}:${clues[clues.length - 1]}`] ?? clues[clues.length - 1]!) : h('p', { class: 'small muted', style: { marginTop: '10px' } }, 'Nobody has poked at it properly yet. Clues turn up when a chicken tries something.'),
@@ -85,7 +85,7 @@ export function renderFarm(ctx: Ctx): HTMLElement {
   return h(
     'div',
     null,
-    h('div', { class: 'screen-title' }, h('h2', null, 'The Farm'), h('span', { class: 'meta' }, `${solvedCount} / ${MAIN_MISSIONS.length} solved`)),
+    h('div', { class: 'screen-title' }, h('h1', null, 'The Farm'), h('span', { class: 'meta' }, `${solvedCount} / ${MAIN_MISSIONS.length} solved`)),
     h('p', { class: 'lede' }, 'A problem appears. You work out what chicken could solve it. You breed that chicken. Then you become it.'),
     map,
     problemCard,

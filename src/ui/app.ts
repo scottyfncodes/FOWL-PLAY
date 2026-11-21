@@ -62,7 +62,7 @@ export class App implements Ctx {
     this.main = h('main', { class: 'screen' });
     this.navEl = h('nav', { class: 'nav', 'aria-label': 'Main' });
     this.root.replaceChildren(
-      h('header', { class: 'header' }, h('div', { class: 'brand' }, h('h1', null, 'Fowl Play'), h('small', null, 'breed it · become it')), h('div', { class: 'header-right' }, this.cornEl, h('button', { class: 'icon-btn', 'aria-label': 'Settings', onclick: () => this.openSettings(), html: SETTINGS_ICON }))),
+      h('header', { class: 'header' }, h('div', { class: 'brand' }, h('p', { class: 'wordmark' }, 'Fowl Play'), h('small', null, 'breed it · become it')), h('div', { class: 'header-right' }, this.cornEl, h('button', { class: 'icon-btn', 'aria-label': 'Settings', onclick: () => this.openSettings(), html: SETTINGS_ICON }))),
       this.main,
       this.navEl,
     );
@@ -74,7 +74,12 @@ export class App implements Ctx {
     if (store.loadNote) setTimeout(() => toast(store.loadNote!), 400);
     this.rerender();
     if (store.state.onboarding === 'pickSecond' || store.state.onboarding === 'welcome') {
-      document.body.appendChild(renderWelcome(this));
+      const welcome = renderWelcome(this);
+      if (welcome.childElementCount > 0) {
+        // The app underneath is out of reach until the welcome is done.
+        document.getElementById('app')?.setAttribute('inert', '');
+        document.body.appendChild(welcome);
+      }
     }
   }
 

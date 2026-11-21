@@ -41,7 +41,7 @@ export function renderFowldex(ctx: Ctx): HTMLElement {
     ...(['flock', 'abilities', 'breeds', 'traits', 'milestones'] as const).map((t) => h('button', { class: ctx.ui.almanacTab === t ? 'active' : '', role: 'tab', onclick: () => { sfx.tap(); ctx.ui.almanacTab = t; ctx.rerender(); } }, { flock: 'Flock', abilities: 'Abilities', breeds: 'Breeds', traits: 'Traits', milestones: 'Milestones' }[t])),
   );
   const body = ctx.ui.almanacTab === 'flock' ? flockTab(ctx) : ctx.ui.almanacTab === 'abilities' ? abilitiesTab(ctx) : ctx.ui.almanacTab === 'breeds' ? breedsTab(ctx) : ctx.ui.almanacTab === 'traits' ? traitsTab(ctx) : milestonesTab(ctx);
-  return h('div', null, h('div', { class: 'screen-title' }, h('h2', null, 'Fowldex')), h('p', { class: 'lede' }, 'Every chicken you have made, everything they can do, and silhouettes of everything you have not found yet.'), tabs, body);
+  return h('div', null, h('div', { class: 'screen-title' }, h('h1', null, 'Fowldex')), h('p', { class: 'lede' }, 'Every chicken you have made, everything they can do, and silhouettes of everything you have not found yet.'), tabs, body);
 }
 
 // ---------------------------------------------------------------------------
