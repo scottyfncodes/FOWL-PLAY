@@ -37,7 +37,7 @@ export function openModal(title: Child, body: (close: () => void) => Child, opts
       'div',
       { class: 'modal', style: opts.wide ? { maxWidth: '820px' } : undefined },
       h('div', { class: 'grab' }),
-      h('div', { class: 'modal-head' }, h('h3', null, title), h('button', { class: 'icon-btn close', 'aria-label': 'Close', onclick: close }, '✕')),
+      h('div', { class: 'modal-head' }, h('h2', null, title), h('button', { class: 'icon-btn close', 'aria-label': 'Close', onclick: close }, '✕')),
       body(close),
     ),
   );

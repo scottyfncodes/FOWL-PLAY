@@ -81,7 +81,7 @@ test('naming: rename the starter on the welcome screen and a chick as it hatches
   await page.click('.welcome .name-edit');
   await page.fill('.welcome .name-form input', 'Henrietta');
   await page.click('.welcome .name-form button[type="submit"]');
-  await expect(page.locator('.welcome .name-editor h3')).toHaveText('Henrietta');
+  await expect(page.locator('.welcome .name-editor h2')).toHaveText('Henrietta');
   await page.click('.welcome .btn.primary.big');
   await page.click('.welcome .pick >> nth=0');
   await expect(page.locator('.problem-card')).toBeVisible();
@@ -167,7 +167,7 @@ test('the farm: head out, play as a chicken, solve breakfast, persist the missio
   await page.click('.farm-card button:has-text("Back to the coop")');
   await expect(page.locator('.farm-root')).toHaveCount(0);
   await expect(page.locator('.log-mission')).toContainText('Breakfast served.');
-  await expect(page.locator('.problem-card h3')).toContainText('The Garden Gate');
+  await expect(page.locator('.problem-card h2')).toContainText('The Garden Gate');
 
   // Persistence across reload.
   await page.reload();

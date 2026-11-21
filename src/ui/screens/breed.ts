@@ -102,7 +102,7 @@ export function renderBreed(ctx: Ctx): HTMLElement {
   return h(
     'div',
     null,
-    h('div', { class: 'screen-title' }, h('h2', null, 'Breeding Pen'), h('span', { class: 'meta' }, `${coopChickens(s).length} chickens available`)),
+    h('div', { class: 'screen-title' }, h('h1', null, 'Breeding Pen'), h('span', { class: 'meta' }, `${coopChickens(s).length} chickens available`)),
     h('p', { class: 'lede' }, 'Pick two parents. The preview shows what the genes could do; the egg shows what they did.'),
     firstTime && (!A || !B) ? h('div', { class: 'hint-callout' }, 'Tap a slot to choose a parent') : null,
     h('div', { class: 'pen' }, slot('A', A), h('div', { class: 'times' }, '×'), slot('B', B)),
